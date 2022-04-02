@@ -1,0 +1,301 @@
+export LS_OPTIONS='--color=auto'
+alias ls='ls $LS_OPTIONS'
+alias ll='ls $LS_OPTIONS -lG'
+alias l='ls $LS_OPTIONS -lA'
+
+alias grep="grep --color=auto"
+alias fgrep="fgrep --color=auto"
+alias egrep="egrep --color=auto"
+
+#if type nerdctl >/dev/null; then
+#	alias docker=nerdctl
+#	alias docker-compose="nerdctl compose"
+#fi
+
+alias csv="sed 's/,/ ,/g' | column -t -s,"
+
+alias reset="reset && printf '\033[2J\033[3J\033[1;1H'"
+
+export LC_CTYPE="en_US.UTF-8"
+
+alias dive='docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive:latest'
+
+if type kubectl &>/dev/null; then
+	#alias kubectl="kubectl --insecure-skip-tls-verify"
+	alias k="kubectl --insecure-skip-tls-verify"
+	alias kx="kubectx"
+	alias kn="kubens"
+fi
+
+alias whitespace="sed 's/ /·/g;s/\t/￫/g;s/\r/§/g;s/$/¶/g'"
+
+if type ts &>/dev/null; then
+	alias ts="ts '%Y-%m-%d %H:%M:%.S %Z -'"
+fi
+
+# SCAN FOR CREDENTIALS
+function gitleaks-scan() {
+	config_file=~/.gitleaks/leaky-repo-custom-new.toml
+	if [ ! -d .git ]; then
+		echo 'Not in a git directory'
+		return 1
+	elif [ ! -f "${config_file}" ]; then
+		echo "Config file not found: ${config_file}"
+		return 1
+	else
+		docker run --rm -v ~/.gitleaks/leaky-repo-custom-new.toml:/config.toml -v "$PWD":/path -w /path ghcr.io/zricethezav/gitleaks:latest detect --config=/config.toml -v --no-git 2>/dev/null | jq -r '.File + "ø" + .Secret + "ø" + .Description' | sort | column -s 'ø' -t | uniq
+	fi
+}
+
+
+export DOCKER_BUILDKIT=1
+export BUILDKIT_PROGRESS=plain
+export DOCKER_SCAN_SUGGEST=false
+
+# DE-ANSI CONTENT
+function deansi() { cat | sed -r 's/^([0-9]|-|T|:|\.|Z)*\s//' | sed 's/\x1B[@A-Z\\\]^_]\|\x1B\[[0-9:;<=>?]*[-!"#$%&'"'"'()*+,.\/]*[][\\@A-Z^_`a-z{|}~]\|\x1B\][0-9;]*.*\x07//g'; }
+
+# ADD a PARAMETER SUPPORT TO SCREEN
+function screen() {
+	if [[ "$1" == "a" ]]; then
+		command screen -x -R
+	else
+		command screen $@
+	fi
+}
+
+#if [ -z "$TMUX" ]; then
+#    tmux attach -t default || tmux new -s default
+#fi
+
+# FUNCTION TO ALLOW yq WITHOUT EXTRA ARGS
+function yq_disabled() {
+	if [[ "$@" == "" ]]; then
+		command yq r - -C
+	else
+		command yq $@
+	fi
+}
+
+# FUNCTION TO ALLOW yq WITHOUT EXTRA ARGS
+# pip install Pygments
+function yq() {
+	if [[ "$@" == "" ]]; then
+		command yq --yaml-output | pygmentize -l yaml
+	else
+		command yq $@
+	fi
+}
+
+# FUNCTION TO PARSE ANSIBLE LOG TASKS
+function ansible-task-parse() {
+	if [[ "$1" == "" ]]; then echo "You need to pass a file to parse"; return 1; fi
+	if [[ ! -f "$1" ]]; then echo "File not found: $1"; return 1; fi
+	cat "$1" \
+		| sed 's/\x1b\[[0-9;]*m//g' \
+		| grep -E '^TASK|^\w+: \[' \
+		| grep -v '^skipping:' \
+		| grep -E '^\w+:' -B1 \
+		| grep -v '^--$' \
+		| grep '^TASK' \
+		| grep -v '\(debug\|set_fact\|include_tasks\|include_vars\|fail\)\]' \
+		| grep -v '\[include_role' \
+		| perl -p -e 's/.*: (.*)\] *.*/\1/' \
+		| grep -v '^TASK' \
+		| awk '!x[$0]++' \
+		| cat -n \
+		| sed -r "s/^\s+//g" \
+		| sed "s/^[0-9]*/& \> /g"
+}
+
+# FUNCTION TO ALLOW WINDOWS WINGET TO RUN IN WSL
+alias winget="winget.exe"
+function wingetu() {
+	upgrade_list_full=$(winget.exe upgrade)
+	echo -e "${upgrade_list_full}"
+	echo '---'
+	upgrade_list_filtered=$(winget.exe upgrade | grep 'winget' | grep -v 'Unknown' | perl -p -e "s/^.*?\s(\w+\..*?)\s.*$/\1/" | grep -vE 'Microsoft.VisualStudioCode')
+	if [[ "${upgrade_list_filtered}" == "" ]]; then
+		echo "Nothing to upgrade"
+		return
+	fi
+	echo "Upgrading the following in 10 seconds . . ."
+	echo -e "${upgrade_list_filtered}"
+	sleep 10
+	echo -e "${upgrade_list_filtered}" | xargs -I % sh -c "winget.exe upgrade -e %"
+}
+
+# CREATE FUNCTION FOR TMUX SHORTCUT (ta)
+unalias ta 2>/dev/null
+function ta() {
+	tmux_session_name=$1
+	if [[ "$tmux_session_name" == "" ]]; then
+		tmux_session_name=0
+	fi
+	tmux attach -t $tmux_session_name || tmux new-session -s $tmux_session_name
+}
+
+### CREATE FUNCTION TO PRINT HELM CHART ###
+### author: Jonathan Fair
+### date: 2020/03/30
+# TO ENABLE YAML COLOR SUPPORT INSTALL https://github.com/mikefarah/yq/releases
+# THIS WILL RUN LOCALLY BUT YOU DO HAVE TO HAVE A VALID KUBECONFIG WITH CONNECTION TO KUBERNETES INSTANCE
+helmprint() {
+	command -v helm >/dev/null || { echo "$(basename $SHELL): command not found: helm" ; return 1 ; }
+	{ helm plugin list | grep tiller >/dev/null 2>&1 ; } || { echo "Please install helm tiller: helm plugin install https://github.com/rimusz/helm-tiller" ; return 1 ; }
+	helm init --client-only >/dev/null 2>&1
+	remove_before='^---$'
+	PARAMS=""
+	for i in "$@"; do
+		case "$1" in
+			--show-vars)
+				remove_before='^COMPUTED VALUES:$'
+				shift
+				;;
+			*)
+				PARAMS="$PARAMS $1"
+				shift
+				;;
+		esac
+	done
+	OUTPUT=$(HELM_TILLER_SILENT=true helm tiller run helm install --dry-run --debug --name helmprint $(echo "$PARAMS"))
+	OUTPUT_YAML=$(echo -e "$OUTPUT" | sed -n -e "/$remove_before/,\$p" | yq -C r -d'*' - 2>/dev/null)
+	if [[ $? -eq 0 ]]; then
+		echo -e "$OUTPUT_YAML"
+	else
+		echo -e "$OUTPUT"
+	fi
+}
+
+helm3print() {
+	command -v helm3 >/dev/null || { echo "$(basename $SHELL): command not found: helm3" ; return 1 ; }
+	remove_before='^---$'
+	PARAMS=""
+	for i in "$@"; do
+		case "$1" in
+			--show-vars)
+				remove_before='^COMPUTED VALUES:$'
+				shift
+				;;
+			*)
+				PARAMS="$PARAMS $1"
+				shift
+				;;
+		esac
+	done
+	OUTPUT=$(helm3 template --debug helmprint $(echo "$PARAMS"))
+	OUTPUT_YAML=$(echo -e "$OUTPUT" | sed -n -e "/$remove_before/,\$p" | yq -C r -d'*' - 2>/dev/null)
+	if [[ $? -eq 0 ]]; then
+		echo -e "$OUTPUT_YAML"
+	else
+		echo -e "$OUTPUT"
+	fi
+}
+
+
+
+# FUNCTION TO RUN PRISMA SCAN
+prisma() {
+	if ! test -f ~/.prisma.conf; then
+		echo "Prisma Configuration not found."
+		return 1
+	fi
+	clear
+	scan_image="$1" \
+	bash -c '
+		. ~/.prisma.conf
+		if [[ ! -f /tmp/twistcli ]]; then
+			echo "Downloading twistcli . . ."
+			curl -s -u "$prisma_username":"$prisma_password" --output /tmp/twistcli "${prisma_url}/api/v1/util/osx/twistcli"
+			echo "done"
+		fi
+		if [[ "$(docker images -q ${scan_image} 2> /dev/null)" == "" ]]; then
+			echo "Pulling image . . ."
+			docker pull ${scan_image}
+		fi
+		chmod 755 /tmp/twistcli
+		echo "Scanning . . ."
+		/tmp/twistcli images scan --address "${prisma_url}" --user "$prisma_username" --password "$prisma_password" --output-file /tmp/${scan_image}.txt --details ${scan_image}
+	'
+}
+
+test -e "${HOME}/.iterm2_shell_integration.bash" && source "${HOME}/.iterm2_shell_integration.bash"
+
+# ADDS CUSTOM KUBECONFIG FILES TO CONTEXT
+# TO SWITCH CONTEXTS AND NAMESPACES USE https://github.com/ahmetb/kubectx
+if test -d ~/.kube; then
+	KUBECONFIG=~/.kube/config
+	mkdir -p "$(dirname "$KUBECONFIG")"
+	touch "$KUBECONFIG"
+	mkdir -p ~/.kube/custom-contexts
+	for i in $(find ~/.kube/custom-contexts/ -type f); do KUBECONFIG="$KUBECONFIG:$i"; done
+	export KUBECONFIG=$KUBECONFIG
+fi
+
+# INSTALL PYENV
+	# brew install pyenv
+	# pyenv install 2.7.16
+	# pyenv versions
+	# pyenv global 2.7.16   --- OR --- pyenv local 2.7.16
+	# VIRTUAL ENVIRONMENT
+	# brew install pyenv-virtualenv
+	# pyenv virtualenv 3.6.4 myvirtualenv
+	# pyenv global myvirtualenv
+if test -d $HOME/.pyenv; then
+	export PYENV_ROOT="$HOME/.pyenv"
+	export PATH="$PYENV_ROOT/bin:$PATH"
+	if command -v pyenv 1>/dev/null 2>&1; then
+		eval "$(pyenv init --path)"
+	fi
+fi
+
+# SET JAVA HOME
+if test -f /usr/libexec/java_home; then
+	export JAVA_8_HOME=$(/usr/libexec/java_home -v1.8)
+	export JAVA_11_HOME=$(/usr/libexec/java_home -v11.0)
+	export JAVA_17_HOME=$(/usr/libexec/java_home -v17.0)
+	alias java8='export JAVA_HOME=$JAVA_8_HOME'
+	alias java11='export JAVA_HOME=$JAVA_11_HOME'
+	alias java17='export JAVA_HOME=$JAVA_17_HOME'
+	export JAVA_HOME=$JAVA_11_HOME
+fi
+
+# WSL EXECUTABLE PATHS
+if test -d /mnt/c; then
+	export PATH="/mnt/c/Windows/System32:$PATH"
+	export PATH="/mnt/c/Users/jonathaf/AppData/Local/Microsoft/WindowsApps:$PATH"
+fi
+
+# NODE PATHS
+if test -d $HOME/.npm-packages/bin; then
+	export PATH="$HOME/.npm-packages/bin:$PATH"
+fi
+
+# SETUP BREW FOR LINUX
+if test -f /home/linuxbrew/.linuxbrew/bin/brew; then
+	eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+# SETUP BREW FOR MAC
+if type brew &>/dev/null; then
+	export PATH="$(brew --prefix)/bin:$PATH"
+	export PATH="$(brew --prefix)/opt/mysql-client@5.7/bin:$PATH"
+	export PATH="$(brew --prefix)/opt/findutils/libexec/gnubin:$PATH" # USE GNU FIND (must first do: brew install findutils)
+	export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH" # USE GNU SED (must first do: brew install gnu-sed)
+	export PATH="$(brew --prefix)/opt/gnu-tar/libexec/gnubin:$PATH" # USE GNU TAR (must first do: brew install gnu-tar)
+	export PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH" # USE GNU READLINK (must first do: brew install coreutils)
+	export PATH="$(brew --prefix)/opt/grep/libexec/gnubin:$PATH" # USE GNU GREP (must first do: brew install grep)
+	export PATH="$(brew --prefix)/opt/gnupg@2.2/bin:$PATH" # USE LEGACY GPG
+	export PATH="$(brew --prefix)/opt/helm@2/bin:$PATH" # NEED TO RUN 'helm init --client-only' AFTER INSTALLING
+	
+	alias brewu='brew upgrade && brew upgrade --cask --greedy'
+	alias gnu-grep="$(brew --prefix 2>/dev/null)/opt/grep/libexec/gnubin/grep --color=auto"
+fi
+
+export PATH="$HOME/.local/bin:$PATH"
+
+test -f ~/.sh_profile_local && source ~/.sh_profile_local
+
+# sleep 0.1
+# clear
+# tpu
