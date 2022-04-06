@@ -1,5 +1,13 @@
 clear
 
+# MANUALLY INSTALL PLUGINS AND THEMES
+# git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+# git clone https://github.com/zsh-users/zsh-completions ~/.oh-my-zsh/custom/plugins/zsh-completions
+# git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+# git clone https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel10k
+# git clone https://github.com/JtMotoX/zsh-jt-themes.git ~/.oh-my-zsh/custom/themes/zsh-jt-themes
+
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -92,7 +100,7 @@ plugins=(git docker docker-compose tmux zsh-syntax-highlighting zsh-autosuggesti
 source $ZSH/oh-my-zsh.sh
 
 # THEME FOR zsh-syntax-highlighting
-source ~/.oh-my-zsh/custom/themes/jt_highlighter_custom.zsh
+source ~/.oh-my-zsh/custom/themes/zsh-jt-themes/jt-highlighting-custom.zsh
 
 # User configuration
 
