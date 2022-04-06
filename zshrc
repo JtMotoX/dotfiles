@@ -149,7 +149,7 @@ setopt rm_star_silent
 
 # SET THE TERMINAL TITLE TO LAST COMMAND
 DISABLE_AUTO_TITLE="true"
-preexec () { print -Pn "\033]0;%m : $1\007" }
+preexec () { print -Pn "\033]0;%m : $1\007"; }
 print -Pn "\033]0;%n@%m\007"
 
 # FIX ZSH-COMPLETIONS FOR APPLE SILICON
