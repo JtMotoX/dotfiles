@@ -64,10 +64,6 @@ function screen() {
 	fi
 }
 
-#if [ -z "$TMUX" ]; then
-#    tmux attach -t default || tmux new -s default
-#fi
-
 # FUNCTION TO ALLOW yq WITHOUT EXTRA ARGS
 function yq_disabled() {
 	if [[ "$@" == "" ]]; then
@@ -134,6 +130,8 @@ function ta() {
 	fi
 	tmux attach -t $tmux_session_name || tmux new-session -s $tmux_session_name
 }
+[ -n "$TMUX" ] && export TERM=screen.xterm-256color # FIX TMUX COLORS
+# [ -z "$TMUX" ] && { tmux attach -t default || tmux new -s default; } # LOAD TMUX ON LOGIN
 
 ### CREATE FUNCTION TO PRINT HELM CHART ###
 ### author: Jonathan Fair
