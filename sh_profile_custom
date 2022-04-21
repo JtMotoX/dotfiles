@@ -130,7 +130,7 @@ function ta() {
 	fi
 	tmux attach -t $tmux_session_name || tmux new-session -s $tmux_session_name
 }
-[ -n "$TMUX" ] && export TERM=screen.xterm-256color # FIX TMUX COLORS
+# [ -n "$TMUX" ] && export TERM=screen.xterm-256color # FIX TMUX COLORS
 # [ -z "$TMUX" ] && { tmux attach -t default || tmux new -s default; } # LOAD TMUX ON LOGIN
 
 ### CREATE FUNCTION TO PRINT HELM CHART ###
