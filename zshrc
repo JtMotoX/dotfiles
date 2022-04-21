@@ -161,7 +161,7 @@ preexec () { print -Pn "\033]0;%m : $1\007"; }
 print -Pn "\033]0;%n@%m\007"
 
 # FIX ZSH-COMPLETIONS FOR APPLE SILICON
-if type brew &>/dev/null; then
+if [[ $(uname -m) == 'arm64' ]] && type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
   FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
   autoload -Uz compinit
