@@ -1,11 +1,11 @@
 clear
 
 # MANUALLY INSTALL PLUGINS AND THEMES
-# git clone https://github.com/zsh-users/zsh-autosuggestions ~/.oh-my-zsh/custom/plugins/zsh-autosuggestions
-# git clone https://github.com/zsh-users/zsh-completions ~/.oh-my-zsh/custom/plugins/zsh-completions
-# git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
-# git clone https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel10k
-# git clone https://github.com/JtMotoX/zsh-jt-themes.git ~/.oh-my-zsh/custom/themes/zsh-jt-themes
+# git -C ~/.oh-my-zsh/custom/plugins clone https://github.com/zsh-users/zsh-autosuggestions
+# git -C ~/.oh-my-zsh/custom/plugins clone https://github.com/zsh-users/zsh-completions
+# git -C ~/.oh-my-zsh/custom/plugins clone https://github.com/zsh-users/zsh-syntax-highlighting.git
+# git -C ~/.oh-my-zsh/custom/themes clone https://github.com/romkatv/powerlevel10k.git
+# git -C ~/.oh-my-zsh/custom/themes clone https://github.com/JtMotoX/zsh-jt-themes.git
 
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
@@ -161,7 +161,7 @@ preexec () { print -Pn "\033]0;%m : $1\007"; }
 print -Pn "\033]0;%n@%m\007"
 
 # FIX ZSH-COMPLETIONS FOR APPLE SILICON
-if type brew &>/dev/null; then
+if [[ $(uname -m) == 'arm64' ]] && type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
   FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
   autoload -Uz compinit
