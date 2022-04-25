@@ -118,8 +118,7 @@ wingetu() {
 		return
 	fi
 	echo "### UPGRADABLE LIST ###"
-	echo -e "${upgrade_list_filtered}"
-	echo "#######################"
+	echo -e "${upgrade_list_filtered}" | sed 's/.*/- &/'
 	while true; do
 		printf "Do you want to continue? [Y/n] "
 		read yn
