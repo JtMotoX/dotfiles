@@ -112,6 +112,7 @@ function ansible-task-parse() {
 alias winget="winget.exe"
 function wingetu() {
 	upgrade_list_full=$(winget.exe upgrade)
+	echo "### FULL LIST ###"
 	echo -e "${upgrade_list_full}"
 	echo '---'
 	upgrade_list_filtered=$(winget.exe upgrade | grep 'winget' | grep -v 'Unknown' | perl -p -e "s/^.*?\s(\w+\..*?)\s.*$/\1/" | grep -vE 'Microsoft.VisualStudioCode')
@@ -119,8 +120,18 @@ function wingetu() {
 		echo "Nothing to upgrade"
 		return
 	fi
-	echo "Upgrading the following in 10 seconds . . ."
+	echo "### UPGRADABLE LIST ###"
 	echo -e "${upgrade_list_filtered}"
+	echo "#######################"
+	while true; do
+		printf "Do you want to continue? [Y/n] "
+		read yn
+		case $yn in
+			[Yy]* ) break;;
+			[Nn]* ) return 0;;
+			* ) echo "Please answer yes or no.";;
+		esac
+	done
 	echo -e "${upgrade_list_filtered}" | xargs -I % sh -c "echo Upgrading: %; winget.exe upgrade -e %;"
 }
 
