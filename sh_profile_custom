@@ -105,8 +105,9 @@ function ansible-task-parse() {
 }
 
 # FUNCTION TO ALLOW WINDOWS WINGET TO RUN IN WSL
-alias winget="winget.exe"
-function wingetu() {
+command -v winget.exe >/dev/null 2>&1 && { alias winget="winget.exe"; } || true
+wingetu() {
+	command -v winget.exe >/dev/null || { echo "'winget.exe' not found"; return 1; }
 	upgrade_list_full=$(winget.exe upgrade)
 	echo "### FULL LIST ###"
 	echo -e "${upgrade_list_full}"
