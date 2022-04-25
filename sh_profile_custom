@@ -219,7 +219,7 @@ prisma() {
 	'
 }
 
-test -e "${HOME}/.iterm2_shell_integration.bash" && source "${HOME}/.iterm2_shell_integration.bash"
+test -e "${HOME}/.iterm2_shell_integration.bash" && { source "${HOME}/.iterm2_shell_integration.bash"; } || true
 
 # ADDS CUSTOM KUBECONFIG FILES TO CONTEXT
 # TO SWITCH CONTEXTS AND NAMESPACES USE https://github.com/ahmetb/kubectx
@@ -294,7 +294,7 @@ fi
 
 export PATH="$HOME/.local/bin:$PATH"
 
-test -f ~/.sh_profile_local && source ~/.sh_profile_local
+test -f ~/.sh_profile_local && { source ~/.sh_profile_local; } || true
 
 # sleep 0.1
 # clear
