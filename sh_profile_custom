@@ -121,8 +121,7 @@ function wingetu() {
 	fi
 	echo "Upgrading the following in 10 seconds . . ."
 	echo -e "${upgrade_list_filtered}"
-	sleep 10
-	echo -e "${upgrade_list_filtered}" | xargs -I % sh -c "winget.exe upgrade -e %"
+	echo -e "${upgrade_list_filtered}" | xargs -I % sh -c "echo Upgrading: %; winget.exe upgrade -e %;"
 }
 
 # CREATE FUNCTION FOR TMUX SHORTCUT (ta)
