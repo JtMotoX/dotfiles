@@ -218,7 +218,7 @@ prisma() {
 		PRISMA_PASS=$(echo "${PRISMA_CREDS}" | cut -d ":" -f 2-)
 		if [[ ! -f /tmp/twistcli ]]; then
 			echo "Downloading twistcli . . ."
-			curl -s -u "$prisma_username":"$prisma_password" --output /tmp/twistcli "${prisma_url}/api/v1/util/osx/twistcli"
+			curl -s -u "${PRISMA_USER}":"${PRISMA_PASS}" --output /tmp/twistcli "${prisma_url}/api/v1/util/osx/twistcli"
 			echo "done"
 		fi
 		if [[ "$(docker images -q ${scan_image} 2> /dev/null)" == "" ]]; then
@@ -227,7 +227,7 @@ prisma() {
 		fi
 		chmod 755 /tmp/twistcli
 		echo "Scanning . . ."
-		/tmp/twistcli images scan --address "${prisma_url}" --user "$prisma_username" --password "$prisma_password" --output-file /tmp/${scan_image}.txt --details ${scan_image}
+		/tmp/twistcli images scan --address "${prisma_url}" --user "${PRISMA_USER}" --password "${PRISMA_PASS}" --output-file /tmp/${scan_image}.txt --details ${scan_image}
 	'
 }
 
