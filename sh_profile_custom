@@ -300,7 +300,7 @@ if type brew &>/dev/null; then
 	export PATH="$(brew --prefix)/opt/gnupg@2.2/bin:$PATH" # USE LEGACY GPG
 	export PATH="$(brew --prefix)/opt/helm@2/bin:$PATH" # NEED TO RUN 'helm init --client-only' AFTER INSTALLING
 	
-	alias brewu='brew upgrade && brew upgrade --cask --greedy'
+	alias brewu='brew upgrade; brew upgrade --cask --greedy'
 	alias gnu-grep="$(brew --prefix 2>/dev/null)/opt/grep/libexec/gnubin/grep --color=auto"
 fi
 
