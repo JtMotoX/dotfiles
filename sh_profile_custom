@@ -288,6 +288,11 @@ if test -f /home/linuxbrew/.linuxbrew/bin/brew; then
 	eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
+# SETUP BREW FOR macOS Apple Silicon
+if test -f /opt/homebrew/bin/brew; then
+	eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
 # SETUP BREW FOR MAC
 if type brew &>/dev/null; then
 	export PATH="$(brew --prefix)/bin:$PATH"
