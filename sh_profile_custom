@@ -298,6 +298,7 @@ if type brew &>/dev/null; then
 	export PATH="$(brew --prefix)/opt/findutils/libexec/gnubin:$PATH" # USE GNU FIND (must first do: brew install findutils)
 	export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH" # USE GNU SED (must first do: brew install gnu-sed)
 	export PATH="$(brew --prefix)/opt/gnu-tar/libexec/gnubin:$PATH" # USE GNU TAR (must first do: brew install gnu-tar)
+	export PATH="$(brew --prefix)/opt/gnu-getopt/bin:$PATH" # USE GNU GETOPT (must first do: brew install getopt)
 	export PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH" # USE GNU READLINK (must first do: brew install coreutils)
 	export PATH="$(brew --prefix)/opt/grep/libexec/gnubin:$PATH" # USE GNU GREP (must first do: brew install grep)
 	export PATH="$(brew --prefix)/opt/gnupg@2.2/bin:$PATH" # USE LEGACY GPG
