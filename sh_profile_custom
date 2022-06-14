@@ -20,13 +20,6 @@ export LC_CTYPE="en_US.UTF-8"
 
 alias dive='docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive:latest'
 
-if type kubectl &>/dev/null; then
-	#alias kubectl="kubectl --insecure-skip-tls-verify"
-	alias k="kubectl --insecure-skip-tls-verify"
-	alias kx="kubectx"
-	alias kn="kubens"
-fi
-
 alias whitespace="sed 's/ /·/g;s/\t/￫/g;s/\r/§/g;s/$/¶/g'"
 
 if type ts &>/dev/null; then
@@ -214,9 +207,13 @@ prisma() {
 	scan_image="$1" \
 	bash -c '
 		. ~/.prisma.conf
+		#ENCRYPT: echo "username:password" | openssl aes-256-cbc -a -salt -pass pass:"YourEncryptionPasswordHere"
+		PRISMA_CREDS=$(echo "${prisma_creds_enc}" | openssl aes-256-cbc -d -a -pass pass:"${prisma_enc}:s@lt")
+		PRISMA_USER=$(echo "${PRISMA_CREDS}" | cut -d ":" -f 1)
+		PRISMA_PASS=$(echo "${PRISMA_CREDS}" | cut -d ":" -f 2-)
 		if [[ ! -f /tmp/twistcli ]]; then
 			echo "Downloading twistcli . . ."
-			curl -s -u "$prisma_username":"$prisma_password" --output /tmp/twistcli "${prisma_url}/api/v1/util/osx/twistcli"
+			curl -s -u "${PRISMA_USER}":"${PRISMA_PASS}" --output /tmp/twistcli "${prisma_url}/api/v1/util/osx/twistcli"
 			echo "done"
 		fi
 		if [[ "$(docker images -q ${scan_image} 2> /dev/null)" == "" ]]; then
@@ -225,7 +222,7 @@ prisma() {
 		fi
 		chmod 755 /tmp/twistcli
 		echo "Scanning . . ."
-		/tmp/twistcli images scan --address "${prisma_url}" --user "$prisma_username" --password "$prisma_password" --output-file /tmp/${scan_image}.txt --details ${scan_image}
+		/tmp/twistcli images scan --address "${prisma_url}" --user "${PRISMA_USER}" --password "${PRISMA_PASS}" --output-file /tmp/${scan_image}.txt --details ${scan_image}
 	'
 }
 
@@ -276,6 +273,11 @@ if test -d /mnt/c; then
 	export PATH="/mnt/c/Users/jonathaf/AppData/Local/Microsoft/WindowsApps:$PATH"
 fi
 
+# RANCHER DESKTOP PATHS
+if test -d "$HOME/.rd/bin"; then
+	export PATH="$HOME/.rd/bin:$PATH"
+fi
+
 # NODE PATHS
 if test -d $HOME/.npm-packages/bin; then
 	export PATH="$HOME/.npm-packages/bin:$PATH"
@@ -286,6 +288,11 @@ if test -f /home/linuxbrew/.linuxbrew/bin/brew; then
 	eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 fi
 
+# SETUP BREW FOR macOS Apple Silicon
+if test -f /opt/homebrew/bin/brew; then
+	eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
 # SETUP BREW FOR MAC
 if type brew &>/dev/null; then
 	export PATH="$(brew --prefix)/bin:$PATH"
@@ -293,16 +300,24 @@ if type brew &>/dev/null; then
 	export PATH="$(brew --prefix)/opt/findutils/libexec/gnubin:$PATH" # USE GNU FIND (must first do: brew install findutils)
 	export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH" # USE GNU SED (must first do: brew install gnu-sed)
 	export PATH="$(brew --prefix)/opt/gnu-tar/libexec/gnubin:$PATH" # USE GNU TAR (must first do: brew install gnu-tar)
+	export PATH="$(brew --prefix)/opt/gnu-getopt/bin:$PATH" # USE GNU GETOPT (must first do: brew install getopt)
 	export PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH" # USE GNU READLINK (must first do: brew install coreutils)
 	export PATH="$(brew --prefix)/opt/grep/libexec/gnubin:$PATH" # USE GNU GREP (must first do: brew install grep)
 	export PATH="$(brew --prefix)/opt/gnupg@2.2/bin:$PATH" # USE LEGACY GPG
 	export PATH="$(brew --prefix)/opt/helm@2/bin:$PATH" # NEED TO RUN 'helm init --client-only' AFTER INSTALLING
 	
-	alias brewu='brew upgrade && brew upgrade --cask --greedy'
+	alias brewu='brew upgrade; brew upgrade --cask --greedy'
 	alias gnu-grep="$(brew --prefix 2>/dev/null)/opt/grep/libexec/gnubin/grep --color=auto"
 fi
 
 export PATH="$HOME/.local/bin:$PATH"
+
+if type kubectl &>/dev/null; then
+	#alias kubectl="kubectl --insecure-skip-tls-verify"
+	alias k="kubectl --insecure-skip-tls-verify"
+	alias kx="kubectx"
+	alias kn="kubens"
+fi
 
 test -f ~/.sh_profile_local && { source ~/.sh_profile_local; } || true
 
