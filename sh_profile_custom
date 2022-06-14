@@ -108,17 +108,19 @@ function ansible-task-parse() {
 command -v winget.exe >/dev/null 2>&1 && { alias winget="winget.exe"; } || true
 wingetu() {
 	command -v winget.exe >/dev/null || { echo "'winget.exe' not found"; return 1; }
-	upgrade_list_full=$(winget.exe upgrade)
-	echo "### FULL LIST ###"
+	local upgrade_list_full=$(winget.exe upgrade)
+	local TITLE="FULL LIST"
+	printf '%*s\n' "$((${COLUMNS:-$(tput cols)}-${#TITLE}-2))" '' | tr ' ' - | perl -p -e "s/^(---)/\1 ${TITLE} /" | perl -p -e "s/^(---)\s\s(-+)/\1\2--/"
 	echo -e "${upgrade_list_full}"
-	echo '---'
-	upgrade_list_filtered=$(winget.exe upgrade | grep 'winget' | grep -v 'Unknown' | perl -p -e "s/^.*?\s(\w+\..*?)\s.*$/\1/" | grep -vE 'Microsoft.VisualStudioCode')
+	local upgrade_list_filtered=$(echo "${upgrade_list_full}" | tr -d "\r" | grep 'winget$' | perl -p -e 's/^.*\s+([^\s]+)\s+([^\s]+)\s+([^\s]+)\s+\w+$/\1\t\2\t\3/' | grep -v '\sUnknown\s' | grep -vE 'Microsoft.VisualStudioCode')
 	if [[ "${upgrade_list_filtered}" == "" ]]; then
 		echo "Nothing to upgrade"
 		return
 	fi
-	echo "### UPGRADABLE LIST ###"
-	echo -e "${upgrade_list_filtered}" | sed 's/.*/- &/'
+	local TITLE="UPGRADABLE LIST"
+	printf '%*s\n' "$((${COLUMNS:-$(tput cols)}-${#TITLE}-2))" '' | tr ' ' - | perl -p -e "s/^(---)/\1 ${TITLE} /" | perl -p -e "s/^(---)\s\s(-+)/\1\2--/"
+	echo -e "${upgrade_list_filtered}" | column -t | sed 's/.*/- &/'
+	printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 	while true; do
 		printf "Do you want to continue? [Y/n] "
 		read yn
@@ -128,7 +130,7 @@ wingetu() {
 			* ) echo "Please answer yes or no.";;
 		esac
 	done
-	echo -e "${upgrade_list_filtered}" | xargs -I % sh -c "echo Upgrading: %; winget.exe upgrade -e %;"
+	echo -e "${upgrade_list_filtered}" | awk '{print $1}' | xargs -I % sh -c "echo Upgrading: %; winget.exe upgrade -e %;"
 }
 
 # CREATE FUNCTION FOR TMUX SHORTCUT (ta)
