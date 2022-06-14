@@ -348,6 +348,10 @@ if type kubectl &>/dev/null; then
 	alias kn="kubens"
 fi
 
+if type ansible-playbook &>/dev/null; then
+	alias ansible-playbook='rm -f $ANSIBLE_LOG_PATH; ansible-playbook'
+fi
+
 test -f ~/.sh_profile_local && { source ~/.sh_profile_local; } || true
 
 # sleep 0.1
