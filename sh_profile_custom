@@ -126,6 +126,35 @@ wingetu() {
 	echo -e "${upgrade_list_filtered}" | awk '{print $1}' | xargs -I % sh -c "echo Upgrading: %; winget.exe upgrade -e %;"
 }
 
+# FUNCTION THAT EXECUTES COMMANDS WHEN A FILE/DIRECTORY IS MODIFIED
+# saveexec /tmp/test.sh
+# saveexec /tmp "/test.sh foo bar"
+saveexec() {
+	local SHELL="${SHELL:-$(which sh)}"
+	"${SHELL}" -c "env >/tmp/fake.txt"
+	local WATCH="$1"
+	shift
+	ls -ld "${WATCH}" >/dev/null || return 1
+	if [ $# -gt 0 ]; then
+		local EXEC="$@"
+	elif [ -f "${WATCH}" ]; then
+		local EXEC="${WATCH}"
+	else
+		echo "What do you want me to do when this directory is modified?"
+		return 1
+	fi
+	echo -ne "\a"
+	clear
+	"${SHELL}" -c "${EXEC}" || true
+	while true; do
+		inotifywait --quiet -e modify "${WATCH}"
+		echo -ne "\a"
+		clear
+		sleep 0.1
+		"${SHELL}" -c "${EXEC}" || true
+	done
+}
+
 # CREATE FUNCTION FOR TMUX SHORTCUT (ta)
 unalias ta 2>/dev/null
 function ta() {
