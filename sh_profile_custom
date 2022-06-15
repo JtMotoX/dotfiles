@@ -130,6 +130,14 @@ wingetu() {
 # saveexec /tmp/test.sh
 # saveexec /tmp "/test.sh foo bar"
 saveexec() {
+	if command -v inotifywait >/dev/null; then
+		local WATCHER="inotifywait"
+	elif command -v fswatch >/dev/null; then
+		local WATCHER="fswatch"
+	else
+		echo "You must install 'inotifywait' for linux or 'fswatch' for macos."
+		return 1
+	fi
 	local SHELL="${SHELL:-$(which sh)}"
 	"${SHELL}" -c "env >/tmp/fake.txt"
 	local WATCH="$1"
@@ -147,7 +155,14 @@ saveexec() {
 	clear
 	"${SHELL}" -c "${EXEC}" || true
 	while true; do
-		inotifywait --quiet -e modify "${WATCH}"
+		if [ "${WATCHER}" = "inotifywait" ]; then
+			inotifywait --quiet -e modify "${WATCH}"
+		elif [ "${WATCHER}" = "fswatch" ]; then
+			local MODIFIED="$(fswatch --one-event "${WATCH}")"
+		else
+			echo "No watcher found"
+			return 1
+		fi
 		echo -ne "\a"
 		clear
 		sleep 0.1
