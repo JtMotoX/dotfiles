@@ -344,6 +344,9 @@ fi
 
 if type ansible-playbook &>/dev/null; then
 	alias ansible-playbook='rm -f $ANSIBLE_LOG_PATH; ansible-playbook'
+	# REQUIRED FOR CONJUR IN PLAYBOOKS
+	[ "$(uname -s)" = "Darwin" ] && export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+	[ "${LANG}" = "" ] && export LANG=en_US.UTF-8
 fi
 
 test -f ~/.sh_profile_local && { source ~/.sh_profile_local; } || true
