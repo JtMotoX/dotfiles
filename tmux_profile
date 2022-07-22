@@ -1,7 +1,9 @@
 # TMUX (the oh-my-zsh tmux plugin will conflict with this)
 if command -v tmux >/dev/null 2>&1; then
 	export TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins"
-	function is_tmux() { ! test -z ${TMUX+x}; }
+	is_tmux() { ! test -z ${TMUX+x}; }
+	tl() { tmux ls; }
+	tkss() { [ -z "$1" ] && echo "You need to provide the session name" || tmux kill-session -t $1; }
 	ta() {
 		is_tmux && { echo "Already in tmux session"; return; }
 		if [ "$1" != "" ]; then
