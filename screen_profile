@@ -1,0 +1,18 @@
+# SCREEN
+if command -v screen >/dev/null 2>&1; then
+	# FIX SCREEN COLORS
+	[ "${TERM}" = "screen" ] && export TERM="screen.xterm-256color"
+	# CHECK IF CURRENTLY IN A SCREEN
+	is_screen() { echo "${TERM}" | grep 'screen' >/dev/null 2>&1; }
+	# LIST SCREEN SESSIONS
+	sl() { screen -ls | sed -E 's/\s+[0-9]+\.([^[:space:]]+).*$/~\1/' | grep '^~' | sed 's/^~//'; }
+	# KILL SCREEN SESSION
+	skss() { screen -XS $1 quit; }
+	# ATTACH OR CREATE SCREEN SESSION
+	sa() { is_screen && { echo "You are already in a screen"; } || { screen -h 5000 -RAar $(screen -ls | grep Detached | awk '{print $1}' | head -n1) >/dev/null 2>&1 || screen -h 5000 -RAa; } }
+	# AUTOMATICALLY ATTACH OR CREATE SCREEN SESSION
+	if [ "$(hostname | sed 's/\..*$//')" = "vmwjjjapp01-dev.disabled" ]; then
+		sa
+		exit 0
+	fi
+fi

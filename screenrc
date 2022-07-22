@@ -1,0 +1,7 @@
+autodetach on
+startup_message off
+hardstatus alwayslastline
+
+termcapinfo xterm* ti@:te@
+
+hardstatus string '%{gk}[%S]%{W}'

@@ -1,0 +1,19 @@
+# TMUX (the oh-my-zsh tmux plugin will conflict with this)
+if command -v tmux >/dev/null 2>&1; then
+	export TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins"
+	function is_tmux() { ! test -z ${TMUX+x}; }
+	ta() {
+		is_tmux && { echo "Already in tmux session"; return; }
+		if [ "$1" != "" ]; then
+			tmux attach -t $1 2>/dev/null || tmux new-session -s $1
+		else
+			tmux attach -t $(tmux list-sessions 2>/dev/null| grep -v '\(attached\)' | sort | head -n1 | sed -E 's/:.*$//') 2>/dev/null || tmux new-session
+		fi
+	}
+	if echo "$(hostname | sed 's/\..*$//')" | grep '^vmw' >/dev/null && ! is_tmux; then
+		ta
+		exit $?
+	fi
+	# [ -n "$TMUX" ] && export TERM=screen.xterm-256color # FIX TMUX COLORS
+	# [ -z "$TMUX" ] && { tmux attach -t default || tmux new -s default; } # LOAD TMUX ON LOGIN
+fi

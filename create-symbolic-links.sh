@@ -28,5 +28,8 @@ create_link ansible.cfg ~/.ansible.cfg
 create_link bash_profile_custom ~/.bash_profile_custom
 create_link p10k.zsh ~/.p10k.zsh
 create_link sh_profile_custom ~/.sh_profile_custom
+create_link screen_profile ~/.screen_profile
+create_link screenrc ~/.screenrc
+create_link tmux_profile ~/.tmux_profile
 create_link tmux.conf ~/.tmux.conf
 create_link zshrc ~/.zshrc

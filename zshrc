@@ -7,6 +7,9 @@ clear
 # git -C ~/.oh-my-zsh/custom/themes clone https://github.com/romkatv/powerlevel10k.git
 # git -C ~/.oh-my-zsh/custom/themes clone https://github.com/JtMotoX/zsh-jt-themes.git
 
+# LOAD TERMINAL MULTIPLEXER CONFIGURATIONS
+test -f ~/.tmux_profile && source ~/.tmux_profile
+# test -f ~/.screen_profile && source ~/.screen_profile
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
@@ -94,7 +97,7 @@ DISABLE_MAGIC_FUNCTIONS=true
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git docker docker-compose tmux zsh-syntax-highlighting zsh-autosuggestions zsh-completions)
+plugins=(git docker docker-compose zsh-syntax-highlighting zsh-autosuggestions zsh-completions)
 # plugins=(git colored-man colorize pip python brew osx zsh-syntax-highlighting zsh-autosuggestions)
 
 source $ZSH/oh-my-zsh.sh
