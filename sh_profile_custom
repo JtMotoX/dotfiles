@@ -254,12 +254,14 @@ test -e "${HOME}/.iterm2_shell_integration.bash" && { source "${HOME}/.iterm2_sh
 # ADDS CUSTOM KUBECONFIG FILES TO CONTEXT
 # TO SWITCH CONTEXTS AND NAMESPACES USE https://github.com/ahmetb/kubectx
 if test -d ~/.kube; then
-	KUBECONFIG=~/.kube/config
+	export KUBECONFIG=~/.kube/config
 	mkdir -p "$(dirname "$KUBECONFIG")"
 	touch "$KUBECONFIG"
 	mkdir -p ~/.kube/custom-contexts
-	for i in $(find ~/.kube/custom-contexts/ -type f); do KUBECONFIG="$KUBECONFIG:$i"; done
-	export KUBECONFIG=$KUBECONFIG
+	for file in $(find ~/.kube/custom-contexts/ -name '*.config' -type f); do
+		file="$(echo "${file}" | sed "s/\/\//\//")" # replace double slashes to single
+		export KUBECONFIG="$KUBECONFIG:${file}"
+	done
 fi
 
 # INSTALL PYENV
