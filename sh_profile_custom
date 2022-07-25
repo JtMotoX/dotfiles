@@ -340,8 +340,10 @@ export PATH="$HOME/.local/bin:$PATH"
 if type kubectl &>/dev/null; then
 	#alias kubectl="kubectl --insecure-skip-tls-verify"
 	alias k="kubectl --insecure-skip-tls-verify"
-	alias kx="kubectx"
-	alias kn="kubens"
+	if type kubectx &>/dev/null; then
+		alias kx="kubectx"
+		alias kn="kubens"
+	fi
 fi
 
 if type ansible-playbook &>/dev/null; then
