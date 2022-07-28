@@ -5,11 +5,18 @@ if command -v tmux >/dev/null 2>&1; then
 	tl() { tmux ls; }
 	tkss() { [ -z "$1" ] && echo "You need to provide the session name" || tmux kill-session -t $1; }
 	ta() {
-		is_tmux && { echo "Already in tmux session"; return; }
-		if [ "$1" != "" ]; then
-			tmux attach -t $1 2>/dev/null || tmux new-session -s $1
+		if is_tmux; then
+			if [ "$1" != "" ]; then
+				tmux switch -t $1 2>/dev/null || { tmux new-session -s $1 -d && tmux switch -t $1; }
+			else
+				tmux switch -t $(tmux list-sessions 2>/dev/null| grep -v '\(attached\)' | sort | head -n1 | awk -F: '{print $1}') 2>/dev/null || { tmux new-session -d && tmux switch -t $(tmux ls -F '#{session_created}:#{session_name}' | sort | tail -n1 | awk -F: '{print $2}'); }
+			fi
 		else
-			tmux attach -t $(tmux list-sessions 2>/dev/null| grep -v '\(attached\)' | sort | head -n1 | sed -E 's/:.*$//') 2>/dev/null || tmux new-session
+			if [ "$1" != "" ]; then
+				tmux attach -t $1 2>/dev/null || tmux new-session -s $1
+			else
+				tmux attach -t $(tmux list-sessions 2>/dev/null| grep -v '\(attached\)' | sort | head -n1 | awk -F: '{print $1}') 2>/dev/null || tmux new-session
+			fi
 		fi
 	}
 	if echo "$(hostname | sed 's/\..*$//')" | grep '^vmw' >/dev/null && ! is_tmux; then
