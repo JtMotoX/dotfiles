@@ -57,16 +57,6 @@ function yq_disabled() {
 	fi
 }
 
-# FUNCTION TO ALLOW yq WITHOUT EXTRA ARGS
-# pip install Pygments
-function yq() {
-	if [[ "$@" == "" ]]; then
-		command yq --yaml-output | pygmentize -l yaml
-	else
-		command yq $@
-	fi
-}
-
 # FUNCTION TO PARSE ANSIBLE LOG TASKS
 function ansible-task-parse() {
 	if [[ "$1" == "" ]]; then echo "You need to pass a file to parse"; return 1; fi
@@ -336,6 +326,22 @@ if type brew &>/dev/null; then
 fi
 
 export PATH="$HOME/.local/bin:$PATH"
+
+
+# FUNCTION TO ALLOW yq WITHOUT EXTRA ARGS
+if type yq &>/dev/null; then
+	function yq() {
+		if [[ "$@" == "" ]]; then
+			if ! type pygmentize &>/dev/null; then
+				echo "pygmentize not found: pip install Pygments"
+				return 1
+			fi
+			command yq --yaml-output | pygmentize -l yaml
+		else
+			command yq $@
+		fi
+	}
+fi
 
 if type kubectl &>/dev/null; then
 	#alias kubectl="kubectl --insecure-skip-tls-verify"
