@@ -224,6 +224,12 @@ prisma() {
 		PRISMA_CREDS=$(echo "${prisma_creds_enc}" | openssl aes-256-cbc -d -a -pass pass:"${prisma_enc}:s@lt")
 		PRISMA_USER=$(echo "${PRISMA_CREDS}" | cut -d ":" -f 1)
 		PRISMA_PASS=$(echo "${PRISMA_CREDS}" | cut -d ":" -f 2-)
+		if [ "${prisma_enc_debug}" == "true" ]; then
+			read -p "Debugging enc details. Press enter to continue . . ."
+			echo "$PRISMA_USER"
+			echo "$PRISMA_PASS"
+			exit 0
+		fi
 		if [[ ! -f /tmp/twistcli ]]; then
 			echo "Downloading twistcli . . ."
 			curl -s -u "${PRISMA_USER}":"${PRISMA_PASS}" --output /tmp/twistcli "${prisma_url}/api/v1/util/osx/twistcli"
