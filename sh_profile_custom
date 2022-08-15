@@ -231,8 +231,16 @@ prisma() {
 			exit 0
 		fi
 		if [[ ! -f /tmp/twistcli ]]; then
+			if [ "$(uname -s)" == "Linux" ]; then
+				prisma_link="twistcli"
+			elif [ "$(uname -s)" == "Darwin" ]; then
+				prisma_link="osx/twistcli"
+			else
+				echo "Unknown platform: $(uname -s)"
+				exit 1
+			fi
 			echo "Downloading twistcli . . ."
-			curl -s -u "${PRISMA_USER}":"${PRISMA_PASS}" --output /tmp/twistcli "${prisma_url}/api/v1/util/osx/twistcli"
+			curl -s -u "${PRISMA_USER}":"${PRISMA_PASS}" --output /tmp/twistcli "${prisma_url}/api/v1/util/${prisma_link}"
 			echo "done"
 		fi
 		if [[ "$(docker images -q ${scan_image} 2> /dev/null)" == "" ]]; then
