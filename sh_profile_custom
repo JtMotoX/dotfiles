@@ -158,8 +158,8 @@ saveexec() {
 # THIS WILL RUN LOCALLY BUT YOU DO HAVE TO HAVE A VALID KUBECONFIG WITH CONNECTION TO KUBERNETES INSTANCE
 helmprint() {
 	command -v helm >/dev/null || { echo "$(basename $SHELL): command not found: helm" ; return 1 ; }
-	{ helm plugin list | grep tiller >/dev/null 2>&1 ; } || { echo "Please install helm tiller: helm plugin install https://github.com/rimusz/helm-tiller" ; return 1 ; }
 	helm init --client-only >/dev/null 2>&1
+	{ helm plugin list | grep tiller >/dev/null 2>&1 ; } || { echo "Please install helm tiller: helm plugin install https://github.com/rimusz/helm-tiller" ; return 1 ; }
 	remove_before='^---$'
 	PARAMS=""
 	for i in "$@"; do
@@ -169,17 +169,19 @@ helmprint() {
 				shift
 				;;
 			*)
-				PARAMS="$PARAMS $1"
+				PARAMS="${PARAMS} $1"
 				shift
 				;;
 		esac
 	done
-	OUTPUT=$(HELM_TILLER_SILENT=true helm tiller run helm install --dry-run --debug --name helmprint $(echo "$PARAMS"))
-	OUTPUT_YAML=$(echo -e "$OUTPUT" | sed -n -e "/$remove_before/,\$p" | yq -C r -d'*' - 2>/dev/null)
-	if [[ $? -eq 0 ]]; then
-		echo -e "$OUTPUT_YAML"
+	OUTPUT=$(HELM_TILLER_SILENT=true helm tiller run helm install --dry-run --debug --name helmprint $(echo "${PARAMS}"))
+	OUTPUT_YAML=$(echo -e "${OUTPUT}" | sed -n -e "/${remove_before}/,\$p" | yq 2>/dev/null)
+	if [ "${OUTPUT_YAML}" = "" ]; then
+		echo -e "${OUTPUT}"
+		echo "that is the output"
 	else
-		echo -e "$OUTPUT"
+		echo -e "${OUTPUT_YAML}"
+		echo "that is the output yaml"
 	fi
 }
 
