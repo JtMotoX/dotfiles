@@ -194,6 +194,36 @@ prisma() {
 	'
 }
 
+# FUNCTION TO GET COMPILED AZURE PIPELINE YAML
+pipeline() {
+	display_help() { echo "pipeline <project> <pipeline_id> <branch>"; return; }
+	PROJECT="$1"
+	PIPELINE_ID="$2"
+	BRANCH="$3"
+	test -z "${PROJECT}" && { echo "Missing parameter"; display_help; return 1; }
+	test -z "${PIPELINE_ID}" && { echo "Missing parameter"; display_help; return 1; }
+	test -z "${BRANCH}" && BRANCH="master"
+	TMP_FILE="/tmp/test.txt"
+	#ENCRYPT: echo "username:password" | openssl aes-256-cbc -a -iter 100000 -salt -pass pass:"YourEncryptionPasswordHere"
+	PIPELINE_ENC="$(. ~/.pipeline.conf && echo "${pipeline_enc}")"
+	PIPELINE_PAT_ENC="$(. ~/.pipeline.conf && echo "${pipeline_pat_enc}")"
+	PIPELINE_CREDS=$(echo "${PIPELINE_PAT_ENC}" | openssl aes-256-cbc -d -a -iter 100000 -pass pass:"${PIPELINE_ENC}:s@lt")
+	PIPELINE_CREDS_B64="$(printf "${PIPELINE_CREDS}" | base64 -w 0)"
+	curl -sS --request POST \
+		--url "https://dev.azure.com/netapp-ngdc/${PROJECT}/_apis/pipelines/${PIPELINE_ID}/preview?api-version=6.1-preview.1" \
+		--header "authorization: Basic ${PIPELINE_CREDS_B64}" \
+		--header "content-type: application/json" \
+		--data '{"previewRun": true, "resources": {"repositories": {"self": {"refName": "refs/heads/'${BRANCH}'"}}}}' \
+	>"${TMP_FILE}"
+	finalYaml="$(cat "${TMP_FILE}" | jq -r '.finalYaml')"
+	if [ "${finalYaml}" = "" ] || [ "${finalYaml}" = "null" ]; then
+		cat "${TMP_FILE}"
+		echo "THERE WAS AN ERROR"
+		return 1
+	fi
+	echo "${finalYaml}"
+}
+
 test -e "${HOME}/.iterm2_shell_integration.bash" && { source "${HOME}/.iterm2_shell_integration.bash"; } || true
 
 # ADDS CUSTOM KUBECONFIG FILES TO CONTEXT
