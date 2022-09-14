@@ -19,9 +19,13 @@ if command -v tmux >/dev/null 2>&1; then
 			fi
 		fi
 	}
-	if echo "$(hostname | sed 's/\..*$//')" | grep '^vmw' >/dev/null && ! is_tmux; then
-		ta
-		exit $?
+	if ! is_tmux; then
+		if echo "$(hostname | sed 's/\..*$//')" | grep '^vmw' >/dev/null; then
+			if ! echo "${PATH}" | grep '.vscode-cli' >/dev/null 2>&1; then
+				ta
+				exit $?
+			fi
+		fi
 	fi
 	# [ -n "$TMUX" ] && export TERM=screen.xterm-256color # FIX TMUX COLORS
 	# [ -z "$TMUX" ] && { tmux attach -t default || tmux new -s default; } # LOAD TMUX ON LOGIN
