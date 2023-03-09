@@ -235,7 +235,7 @@ if test -d ~/.kube; then
 	mkdir -p "$(dirname "$KUBECONFIG")"
 	touch "$KUBECONFIG"
 	mkdir -p ~/.kube/custom-contexts
-	for file in $(find ~/.kube/custom-contexts/ -name '*.config' -type f); do
+	for file in $(find ~/.kube/custom-contexts/ -name '*.config' \( -type f -o -type l \)); do
 		file="$(echo "${file}" | sed "s/\/\//\//")" # replace double slashes to single
 		export KUBECONFIG="$KUBECONFIG:${file}"
 	done
@@ -315,20 +315,20 @@ fi
 export PATH="$HOME/.local/bin:$PATH"
 
 
-# FUNCTION TO ALLOW yq WITHOUT EXTRA ARGS
-if type yq &>/dev/null; then
-	function yq() {
-		if [[ "$@" == "" ]]; then
-			if ! type pygmentize &>/dev/null; then
-				echo "pygmentize not found: pip install Pygments"
-				return 1
-			fi
-			command yq --yaml-output | pygmentize -l yaml
-		else
-			command yq $@
-		fi
-	}
-fi
+# # FUNCTION TO ALLOW yq WITHOUT EXTRA ARGS
+# if type yq &>/dev/null; then
+# 	function yq() {
+# 		if [[ "$@" == "" ]]; then
+# 			if ! type pygmentize &>/dev/null; then
+# 				echo "pygmentize not found: pip install Pygments"
+# 				return 1
+# 			fi
+# 			command yq --yaml-output | pygmentize -l yaml
+# 		else
+# 			command yq $@
+# 		fi
+# 	}
+# fi
 
 if type kubectl &>/dev/null; then
 	#alias kubectl="kubectl --insecure-skip-tls-verify"
