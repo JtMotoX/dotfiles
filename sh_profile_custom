@@ -32,14 +32,16 @@ fi
 function gitleaks-scan() {
 	config_file=~/.gitleaks/leaky-repo-custom-new.toml
 	if [ ! -d .git ]; then
-		echo 'Not in a git directory'
-		return 1
-	elif [ ! -f "${config_file}" ]; then
+		echo "WARNING: Not in a git directory '$PWD'"
+		printf "%s " "Press enter to continue"
+		read ans
+	fi
+	if [ ! -f "${config_file}" ]; then
 		echo "Config file not found: ${config_file}"
 		return 1
-	else
-		docker run --rm -v ~/.gitleaks/leaky-repo-custom-new.toml:/config.toml -v "$PWD":/path -w /path ghcr.io/zricethezav/gitleaks:latest detect --config=/config.toml -v --no-git 2>/dev/null | jq -r '.File + "ø" + .Secret + "ø" + .Description' | sort | column -s 'ø' -t | uniq
 	fi
+	echo "Scanning . . ."
+	docker run --rm -v "${config_file}:/config.toml" -v "$PWD":/path -w /path ghcr.io/zricethezav/gitleaks:latest detect --config=/config.toml -v --no-git 2>/dev/null | jq -r '.File + "ø" + .Secret + "ø" + .Description' | sort | column -s 'ø' -t | uniq
 }
 
 
