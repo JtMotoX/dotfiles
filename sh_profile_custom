@@ -44,6 +44,17 @@ function gitleaks-scan() {
 	docker run --rm -v "${config_file}:/config.toml" -v "$PWD":/path -w /path ghcr.io/zricethezav/gitleaks:latest detect --config=/config.toml -v --no-git 2>/dev/null | jq -r '.File + "ø" + .Secret + "ø" + .Description' | sort | column -s 'ø' -t | uniq
 }
 
+# SCAN IMAGE FOR CREDENTIALS
+function image-secret-scanner() {
+	IMAGE_SCAN_RESULTS_FILE="image-scan-results.json"
+	rm -f "${IMAGE_SCAN_RESULTS_FILE}"
+	docker run --rm -v $(pwd):/home/deepfence/output -v /var/run/docker.sock:/var/run/docker.sock deepfenceio/deepfence_secret_scanner:latest --json-filename="${IMAGE_SCAN_RESULTS_FILE}" -image-name $1 >/dev/null
+	cat "./${IMAGE_SCAN_RESULTS_FILE}" | jq -r '.Secrets[] | ."Matched Rule Name" + "ø" + .Severity + "ø" + ("/" + ."Full File Name")' | sort | column -s 'ø' -t | uniq
+	echo
+	echo "-- ENVIRONMENT VARIABLES --"
+	docker run --rm $1 env
+}
+
 
 export DOCKER_BUILDKIT=1
 export BUILDKIT_PROGRESS=plain
