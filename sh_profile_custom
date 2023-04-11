@@ -24,6 +24,13 @@ alias trivy="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.i
 
 alias whitespace="sed 's/ /·/g;s/\t/￫/g;s/\r/§/g;s/$/¶/g'"
 
+
+# STRIP ANSI CHARACTERS SUCH AS COLORS FROM TEE OUTPUT FILE
+function teee() {
+	type tee &>/dev/null || { echo "The 'tee' command is required for 'teee'"; return 1; }
+	tee >(sed $'s/\033[[][^A-Za-z]*[A-Za-z]//g' > $1)
+}
+
 if type ts &>/dev/null; then
 	alias ts="ts '%Y-%m-%d %H:%M:%.S %Z -'"
 fi
@@ -357,7 +364,8 @@ if type velero &>/dev/null; then
 fi
 
 if type ansible-playbook &>/dev/null; then
-	alias ansible-playbook='rm -f $ANSIBLE_LOG_PATH; ansible-playbook'
+	export ANSIBLE_FORCE_COLOR=True
+	# alias ansible-playbook='rm -f $ANSIBLE_LOG_PATH; ansible-playbook'
 	# REQUIRED FOR CONJUR IN PLAYBOOKS
 	[ "$(uname -s)" = "Darwin" ] && export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 	[ "${LANG}" = "" ] && export LANG=en_US.UTF-8
