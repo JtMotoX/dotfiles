@@ -20,7 +20,7 @@ export LC_CTYPE="en_US.UTF-8"
 
 alias dive='docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive:latest'
 
-alias dfimage="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock alpine/dfimage"
+alias dfimage="docker run --rm -i -v /var/run/docker.sock:/var/run/docker.sock alpine/dfimage"
 
 alias trivy="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/aquasecurity/trivy:latest image --scanners vuln --ignore-unfixed"
 
