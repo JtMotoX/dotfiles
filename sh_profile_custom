@@ -369,8 +369,10 @@ if type kubectl &>/dev/null; then
 
 	# KUBERNETES CLUSTER INFO
 	ki() {
-		CLUSTER_NAME="$(kubectl get daemonset instana-agent -n instana-agent -o jsonpath='{.spec.template.spec.containers[*].env[?(@.name=="INSTANA_KUBERNETES_CLUSTER_NAME")].value}')"
-		CLUSTER_URL="$(kubectl cluster-info | sed -r "s/\x1B\[[0-9;]*[mK]//g" | grep 'Kubernetes control plane' | sed 's/.*is running at //' | sed 's|/k8s/clusters/|/dashboard/c/|')"
+		# CLUSTER_NAME="$(kubectl get daemonset instana-agent -n instana-agent -o jsonpath='{.spec.template.spec.containers[*].env[?(@.name=="INSTANA_KUBERNETES_CLUSTER_NAME")].value}')"
+		CLUSTER_NAME="$(kubectl config view --minify -o jsonpath='{.clusters[].name}{"\n"}')"
+		# CLUSTER_URL="$(kubectl cluster-info | sed -r "s/\x1B\[[0-9;]*[mK]//g" | grep 'Kubernetes control plane' | sed 's/.*is running at //' | sed 's|/k8s/clusters/|/dashboard/c/|')"
+		CLUSTER_URL="$(kubectl config view --minify -o json | jq -r '.clusters[].cluster.server')"
 		AMBASSADOR_ID="$(kubectl get host -n ambassador -o json | jq -r '.items[] | select(.metadata.name | startswith("aes-internal-host-") and endswith("-cloudone-netapp-com")) | select(.metadata.name != "aes-internal-host-cloudone-netapp-com") | .spec.hostname' | grep -o -E 'prd[0-9]+')"
 		NAMESPACE_CONTEXT="$(kubectl config view --minify --output 'jsonpath={..namespace}')"
 		printf "Cluster Name:\t${CLUSTER_NAME}\n"
