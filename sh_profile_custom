@@ -396,6 +396,42 @@ if type kubectl &>/dev/null; then
 		}
 		compdef _ke ke
 	fi
+
+	kxn() {
+		SEARCH_NS="$1"
+		NS_RESULTS_COMBINED=""
+		if [ "${SEARCH_NS}" = "" ]; then
+			echo "You need to specify the namespace search filter"
+			return 1
+		fi
+		ls ~/.kube/custom-contexts/netapp/*.config | while read -r KUBECONFIG_FILE; do
+			NS_RESULTS="$(KUBECONFIG="${KUBECONFIG_FILE}" kubectl get ns | grep ${SEARCH_NS} | awk '{print $1}')"
+			if [ "${NS_RESULTS}" != "" ]; then
+				CURRENT_CONTEXT="$(KUBECONFIG="${KUBECONFIG_FILE}" kubectl config current-context)"
+				NS_RESULTS_COMBINED="$(echo "${NS_RESULTS_COMBINED}\n${NS_RESULTS}" | sed -e '/^$/d')"
+				# CLUSTER_NAME="$(KUBECONFIG="${KUBECONFIG_FILE}" kubectl config view --minify -o jsonpath='{.clusters[].name}{"\n"}')"
+				echo "${CURRENT_CONTEXT}"
+				echo "${NS_RESULTS}" | sed -e 's/^/- /'
+			fi
+		done
+		NS_RESULTS_COMBINED="$(echo "${NS_RESULTS_COMBINED}" | sed -e '/^$/d')"
+		NS_RESULTS_COMBINED_COUNT="$(echo "${NS_RESULTS_COMBINED}" | sed -e '/^$/d' | wc -l)"
+		if [ ${NS_RESULTS_COMBINED_COUNT} -eq 0 ]; then
+			echo "Namespace not found in any clusters"
+			return 1
+		elif [ ${NS_RESULTS_COMBINED_COUNT} -gt 1 ]; then
+			echo "Multiple namespaces found. Unable to set context."
+			return 1
+		elif [ ${NS_RESULTS_COMBINED_COUNT} -eq 1 ]; then
+			kubectx "${CURRENT_CONTEXT}"
+			kubens "${NS_RESULTS_COMBINED}"
+			return
+		else
+			echo "There was an error"
+			return 1
+		fi
+	}
+
 fi
 
 if type velero &>/dev/null; then
