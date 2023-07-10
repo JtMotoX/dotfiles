@@ -26,6 +26,19 @@ alias trivy="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.i
 
 alias whitespace="sed 's/ /·/g;s/\t/￫/g;s/\r/§/g;s/$/¶/g'"
 
+# FUNCTION TO CALCULATE COMPRESSED DOCKER IMAGE SIZE
+docker-size() {
+	previous_pipefail=$(set +o | grep pipefail)
+	set -o pipefail
+	trap 'trap - ERR; eval "${previous_pipefail}"; return 1;' ERR
+	IMAGE=$1
+	if [ "${IMAGE}" = "" ]; then echo "You must specify the image you want to calculate."; return 1; fi
+	echo "Calculating compressed image size . . ."
+	docker save "${IMAGE}" | gzip >/tmp/test.tgz
+	du -h /tmp/test.tgz | cut -f1
+	rm -f /tmp/test.tgz 2>/dev/null || true
+	trap - ERR
+}
 
 # STRIP ANSI CHARACTERS SUCH AS COLORS FROM TEE OUTPUT FILE
 function teee() {
