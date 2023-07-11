@@ -26,6 +26,15 @@ alias trivy="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.i
 
 alias whitespace="sed 's/ /·/g;s/\t/￫/g;s/\r/§/g;s/$/¶/g'"
 
+# FUNCTION TO GIVE VSC URL
+vsc() {
+	relpath="$1"
+	if [ "${relpath}" = "" ]; then relpath="$(pwd)"; fi
+	if [ ! -d "${relpath}" ]; then echo "Path not found: '${relpath}'"; return 1; fi
+	abspath="$(cd ${relpath} && pwd)"
+	echo "https://vsc:4443/?folder=${abspath}"
+}
+
 # FUNCTION TO CALCULATE COMPRESSED DOCKER IMAGE SIZE
 docker-size() {
 	previous_pipefail=$(set +o | grep pipefail)
