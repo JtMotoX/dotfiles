@@ -417,6 +417,14 @@ if type kubectl &>/dev/null; then
 		compdef _ke ke
 	fi
 
+	# KUBECTL POD LOGS
+	kl() { kubectl logs $@; }
+	if type compdef &>/dev/null; then
+		_kl() { _arguments "1: :($(kubectl get po -o jsonpath='{.items[*].metadata.name}'))"; }
+		compdef _kl kl
+	fi
+
+	# FUNCTION TO SEARCH ALL CLUSTERS FOR NAMESPACE
 	kxn() {
 		SEARCH_NS="$1"
 		NS_RESULTS_COMBINED=""
