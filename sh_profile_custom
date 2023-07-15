@@ -26,7 +26,7 @@ alias trivy="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.i
 
 alias whitespace="sed 's/ /·/g;s/\t/￫/g;s/\r/§/g;s/$/¶/g'"
 
-alias bfg='docker run --rm -v "$(pwd):$(pwd)" -w "$(pwd)" -u $(id -u ${USER}):$(id -g ${USER}) jtmotox/bfg'
+alias bfg='docker run --rm -it -v "$(pwd):/work" -u $(id -u ${USER}):$(id -g ${USER}) jtmotox/bfg'
 
 # FUNCTION TO GIVE VSC URL
 vsc() {
