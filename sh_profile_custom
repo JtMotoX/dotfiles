@@ -426,6 +426,23 @@ if type kubectl &>/dev/null; then
 		compdef _kl kl
 	fi
 
+	# KUBECTL PORT-FOWARD FUNCTION
+	kf() {
+		[ $# -eq 0 ] && { echo "You need to specify the service name"; return 1; }
+		INSTANCE_NAME=$1; shift
+		[ $# -eq 0 ] || { ARGS=("$@"); }
+		APP_LABEL="$(kubectl get ${INSTANCE_NAME} -o jsonpath='{.metadata.labels.app}')"
+		PORT_LIST="$(kubectl get services --selector=app=${APP_LABEL} -o json | jq -r '.items[].spec.ports[].port')"
+		PORT_MAPPING=${PORT_LIST}:${PORT_LIST}
+		set -x
+		kubectl port-forward ${INSTANCE_NAME} --address 0.0.0.0 ${PORT_MAPPING}
+		{ set +x; } 2>/dev/null
+	}
+	if type compdef &>/dev/null; then
+		_kf() { _arguments "1: :($(kubectl get deployment,sts --no-headers | awk '{print $1}' | sed 's/\.apps//'))"; }
+		compdef _kf kf
+	fi
+
 	# FUNCTION TO SEARCH ALL CLUSTERS FOR NAMESPACE
 	kxn() {
 		SEARCH_NS="$1"
