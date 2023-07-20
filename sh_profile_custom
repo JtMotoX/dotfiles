@@ -38,7 +38,7 @@ vsc() {
 }
 
 # FUNCTION TO CALCULATE COMPRESSED DOCKER IMAGE SIZE
-docker-size() {
+docker_size() {
 	previous_pipefail=$(set +o | grep pipefail)
 	set -o pipefail
 	trap 'trap - ERR; eval "${previous_pipefail}"; return 1;' ERR
@@ -50,6 +50,7 @@ docker-size() {
 	rm -f /tmp/test.tgz 2>/dev/null || true
 	trap - ERR
 }
+alias docker-size="docker_size"
 
 # STRIP ANSI CHARACTERS SUCH AS COLORS FROM TEE OUTPUT FILE
 function teee() {
@@ -62,7 +63,7 @@ if type ts &>/dev/null; then
 fi
 
 # SCAN FOR CREDENTIALS
-function gitleaks-scan() {
+gitleaks_scan() {
 	config_file=~/.gitleaks/leaky-repo-custom-new.toml
 	if [ ! -d .git ]; then
 		echo "WARNING: Not in a git directory '$PWD'"
@@ -76,9 +77,10 @@ function gitleaks-scan() {
 	echo "Scanning . . ."
 	docker run --rm -v "${config_file}:/config.toml" -v "$PWD":/path -w /path ghcr.io/zricethezav/gitleaks:latest detect --config=/config.toml -v --no-git 2>/dev/null | jq -r '.File + "ø" + .Secret + "ø" + .Description' | sort | column -s 'ø' -t | uniq
 }
+alias gitleaks-scan="gitleaks_scan"
 
 # SCAN IMAGE FOR CREDENTIALS
-function image-secret-scanner() {
+image_secret_scanner() {
 	IMAGE_SCAN_RESULTS_FILE="image-scan-results.json"
 	rm -f "${IMAGE_SCAN_RESULTS_FILE}"
 	docker run --rm -v $(pwd):/home/deepfence/output -v /var/run/docker.sock:/var/run/docker.sock deepfenceio/deepfence_secret_scanner:latest --json-filename="${IMAGE_SCAN_RESULTS_FILE}" -image-name $1 >/dev/null
@@ -87,6 +89,7 @@ function image-secret-scanner() {
 	echo "-- ENVIRONMENT VARIABLES --"
 	docker run --rm $1 env
 }
+alias image-secret-scanner="image_secret_scanner"
 
 
 export DOCKER_BUILDKIT=1
@@ -94,10 +97,10 @@ export BUILDKIT_PROGRESS=plain
 export DOCKER_SCAN_SUGGEST=false
 
 # DE-ANSI CONTENT
-function deansi() { cat | sed -r 's/^([0-9]|-|T|:|\.|Z)*\s//' | sed 's/\x1B[@A-Z\\\]^_]\|\x1B\[[0-9:;<=>?]*[-!"#$%&'"'"'()*+,.\/]*[][\\@A-Z^_`a-z{|}~]\|\x1B\][0-9;]*.*\x07//g'; }
+deansi() { cat | sed -r 's/^([0-9]|-|T|:|\.|Z)*\s//' | sed 's/\x1B[@A-Z\\\]^_]\|\x1B\[[0-9:;<=>?]*[-!"#$%&'"'"'()*+,.\/]*[][\\@A-Z^_`a-z{|}~]\|\x1B\][0-9;]*.*\x07//g'; }
 
 # FUNCTION TO ALLOW yq WITHOUT EXTRA ARGS
-function yq_disabled() {
+yq_disabled() {
 	if [[ "$@" == "" ]]; then
 		command yq r - -C
 	else
@@ -106,7 +109,7 @@ function yq_disabled() {
 }
 
 # FUNCTION TO PARSE ANSIBLE LOG TASKS
-function ansible-task-parse() {
+ansible_task_parse() {
 	if [[ "$1" == "" ]]; then echo "You need to pass a file to parse"; return 1; fi
 	if [[ ! -f "$1" ]]; then echo "File not found: $1"; return 1; fi
 	cat "$1" \
@@ -125,6 +128,7 @@ function ansible-task-parse() {
 		| sed -r "s/^\s+//g" \
 		| sed "s/^[0-9]*/& \> /g"
 }
+alias ansible-task-parse="ansible_task_parse"
 
 # FUNCTION TO ALLOW WINDOWS WINGET TO RUN IN WSL
 command -v winget.exe >/dev/null 2>&1 && { alias winget="winget.exe"; } || true
