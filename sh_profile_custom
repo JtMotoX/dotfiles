@@ -54,16 +54,21 @@ alias docker-size="docker_size"
 
 # STRIP ANSI CHARACTERS SUCH AS COLORS FROM TEE OUTPUT FILE
 teee() {
-    type tee >/dev/null || { echo "The 'tee' command is required for 'teee'"; return 1; }
-    if [ $# -ne 1 ]; then
-        echo "Usage: teee <filename>"
-        return 1
-    fi
-	tmp_file=$(mktemp)
-	awk '{gsub(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]/,""); print}' > "$tmp_file"
-	tee "$tmp_file" > "$1"
-	rm "$tmp_file"
+	type tee &>/dev/null || { echo "The 'tee' command is required for 'teee'"; return 1; }
+    [ $# -eq 1 ] || { echo "Usage: teee <filename>"; return 1; }
+	tee >(sed $'s/\033[[][^A-Za-z]*[A-Za-z]//g' > $1)
 }
+# teee() {
+#     type tee >/dev/null || { echo "The 'tee' command is required for 'teee'"; return 1; }
+#     if [ $# -ne 1 ]; then
+#         echo "Usage: teee <filename>"
+#         return 1
+#     fi
+# 	tmp_file=$(mktemp)
+# 	awk '{gsub(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]/,""); print}' > "$tmp_file"
+# 	tee "$tmp_file" > "$1"
+# 	rm "$tmp_file"
+# }
 
 if type ts &>/dev/null; then
 	alias ts="ts '%Y-%m-%d %H:%M:%.S %Z -'"
