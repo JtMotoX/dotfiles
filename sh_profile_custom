@@ -445,9 +445,16 @@ if type kubectl &>/dev/null; then
 	fi
 
 	# KUBECTL POD LOGS
-	kl() { kubectl logs $@; }
+	kl() {
+		set -x
+		kubectl logs --all-containers=true --ignore-errors=true -l app.kubernetes.io/name=$@;
+		{ set +x; } 2>/dev/null
+	}
 	if type compdef &>/dev/null; then
-		_kl() { _arguments "1: :($(kubectl get po -o jsonpath='{.items[*].metadata.name}'))"; }
+		_kl() {
+			apps=$(kubectl get po -o jsonpath='{range .items[*]}{.metadata.labels.app\.kubernetes\.io\/name}{"\n"}{end}' | sort | uniq)
+			_arguments "1: :(${apps})";
+		}
 		compdef _kl kl
 	fi
 
