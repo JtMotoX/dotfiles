@@ -440,7 +440,7 @@ if type kubectl &>/dev/null; then
 		{ set +x; } 2>/dev/null
 	}
 	if type compdef &>/dev/null; then
-		_ke() { _arguments "1: :($(kubectl get po -o jsonpath='{.items[*].metadata.labels.app\.kubernetes\.io/name}' | sort | uniq))"; }
+		_ke() { _arguments "1: :($(kubectl get po -o jsonpath='{range .items[*]}{.metadata.labels.app\.kubernetes\.io/name}{"\n"}{end}' | sort | uniq))"; }
 		compdef _ke ke
 	fi
 
