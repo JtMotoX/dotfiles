@@ -3,6 +3,7 @@ if command -v tmux >/dev/null 2>&1; then
 	export TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins"
 	is_tmux() { ! test -z ${TMUX+x}; }
 	tl() { tmux ls; }
+	tks() { tmux kill-server; }
 	tkss() { [ -z "$1" ] && echo "You need to provide the session name" || tmux kill-session -t $1; }
 	ta() {
 		if is_tmux; then
