@@ -540,6 +540,9 @@ if type ansible-playbook &>/dev/null; then
 	[ "${LANG}" = "" ] && export LANG=en_US.UTF-8
 fi
 
+# FIX VISUAL STUDIO CODE SERVER KEYCHAIN ERROR
+export VSCODE_CLI_USE_FILE_KEYCHAIN=1
+
 test -f ~/.sh_profile_local && { source ~/.sh_profile_local; } || true
 
 # sleep 0.1
