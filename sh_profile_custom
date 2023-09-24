@@ -325,13 +325,18 @@ fi
 
 # SET JAVA HOME
 if /usr/libexec/java_home >/dev/null 2>&1; then
-	export JAVA_8_HOME=$(/usr/libexec/java_home -v1.8)
-	export JAVA_11_HOME=$(/usr/libexec/java_home -v11.0)
-	export JAVA_17_HOME=$(/usr/libexec/java_home -v17.0)
-	alias java8='export JAVA_HOME=$JAVA_8_HOME'
-	alias java11='export JAVA_HOME=$JAVA_11_HOME'
-	alias java17='export JAVA_HOME=$JAVA_17_HOME'
-	export JAVA_HOME=$JAVA_11_HOME
+	set_java_home() {
+		JAVA_TMP_HOME=$(/usr/libexec/java_home -v$2 -F 2>/dev/null || true)
+		[ "${JAVA_TMP_HOME}" != "" ] || return 0
+		export JAVA_${1}_HOME="${JAVA_TMP_HOME}"
+		export JAVA_HOME="${JAVA_TMP_HOME}"
+		alias java${1}="export JAVA_HOME=\"${JAVA_TMP_HOME}\""
+	}
+	# IN ORDER OF LEAST DESIRED DEFAULT
+	set_java_home 7 1.7
+	set_java_home 8 1.8
+	set_java_home 17 17.0
+	set_java_home 11 11.0
 fi
 
 # WSL EXECUTABLE PATHS
