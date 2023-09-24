@@ -324,7 +324,7 @@ if test -d $HOME/.pyenv; then
 fi
 
 # SET JAVA HOME
-if test -f /usr/libexec/java_home; then
+if /usr/libexec/java_home >/dev/null 2>&1; then
 	export JAVA_8_HOME=$(/usr/libexec/java_home -v1.8)
 	export JAVA_11_HOME=$(/usr/libexec/java_home -v11.0)
 	export JAVA_17_HOME=$(/usr/libexec/java_home -v17.0)
