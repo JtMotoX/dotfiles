@@ -412,6 +412,37 @@ if type kubectl &>/dev/null; then
 		alias kn="kubens"
 	fi
 
+	# TEST ALL KUBECONFIGS
+	kx_test() {
+		ERROR_LOG_FILE="/tmp/kx_test-error.log"
+		RED='\033[0;31m'
+		GREEN='\033[0;32m'
+		BLUE='\033[0;34m'
+		NC='\033[0m' # NO COLOR
+		find ~/.kube/custom-contexts/ -name '*.config' \( -type f -o -type l \) | while read -r k; do
+			rm -f "${ERROR_LOG_FILE}"
+			CLUSTER_NAME="$(KUBECONFIG=$k kubectl config view -o jsonpath='{.clusters[].name}')"
+			PROGRESS_LINE="--- ${CLUSTER_NAME} ---"
+			tput civis # HIDE CURSOR
+			printf "${BLUE}${PROGRESS_LINE} ⏳${NC}"
+			KUBECONFIG=$k kubectl get po -n default >/dev/null 2>"${ERROR_LOG_FILE}"
+			if [ $? != 0 ] || grep -q '[^[:space:]]' "${ERROR_LOG_FILE}"; then
+				KUBECONFIG_ERROR=true
+				printf "\r\033[K${RED}${PROGRESS_LINE} ❌${NC}\n"
+				cat "${ERROR_LOG_FILE}"
+			else
+				printf "\r\033[K${GREEN}${PROGRESS_LINE} ✅${NC}\n"
+			fi
+			tput cnorm # SHOW CURSOR
+			rm -f "${ERROR_LOG_FILE}"
+		done
+		if [ "${KUBECONFIG_ERROR}" = "true" ]; then
+			return 1
+		fi
+	}
+	alias kx-test="kx_test"
+	alias kube-test="kx_test"
+
 	# KUBERNETES CLUSTER INFO
 	ki() {
 		# CLUSTER_NAME="$(kubectl get daemonset instana-agent -n instana-agent -o jsonpath='{.spec.template.spec.containers[*].env[?(@.name=="INSTANA_KUBERNETES_CLUSTER_NAME")].value}')"
