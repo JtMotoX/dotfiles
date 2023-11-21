@@ -34,3 +34,4 @@ create_link tmux_profile ~/.tmux_profile
 create_link tmux.conf ~/.tmux.conf
 create_link zshrc ~/.zshrc
 create_link vimrc ~/.vimrc
+create_link Microsoft.PowerShell_profile.ps1 ~/.config/powershell/Microsoft.PowerShell_profile.ps1
