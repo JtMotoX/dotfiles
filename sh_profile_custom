@@ -82,12 +82,26 @@ gitleaks_scan() {
 		printf "%s " "Press enter to continue"
 		read ans
 	fi
+	TEMPDIR="$(mktemp -d)"
+	echo "TEMPDIR: ${TEMPDIR}"
+	chmod 777 "${TEMPDIR}"
 	if [ ! -f "${config_file}" ]; then
-		echo "Config file not found: ${config_file}"
-		return 1
+		echo "WARNING: Config file not found: '${config_file}'"
+		config_file="${TEMPDIR}/config.toml"
+		printf "[extend]\nuseDefault = true" >"${config_file}"
+		# return 1
 	fi
 	echo "Scanning . . ."
-	docker run --rm -v "${config_file}:/config.toml" -v "$PWD":/path -w /path ghcr.io/zricethezav/gitleaks:latest detect --config=/config.toml -v --no-git 2>/dev/null | jq -r '.File + "ø" + .Secret + "ø" + .Description' | sort | column -s 'ø' -t | uniq
+	docker run --rm -v "${config_file}:/config.toml" -v "$PWD":/path -v "${TEMPDIR}:${TEMPDIR}" -w /path ghcr.io/zricethezav/gitleaks:latest detect --config=/config.toml --no-banner -f json -r "${TEMPDIR}/results.json"
+	if cat "${TEMPDIR}/results.json" | jq -r '.[] | "Entry:" + .File + "ø" + .Secret + "ø" + .Description + "ø" + .Commit' | grep '^Entry:' | sed 's/^Entry://' | sort | column -s 'ø' -t | uniq; then
+		echo "not removing tempdir"
+		# rm -rf "${TEMPDIR}"
+	else
+		echo "There was an error parsing the results"
+		echo "Results are stored at '${TEMPDIR}/results.json'"
+		echo "Make sure to delete the results once you are finished"
+		return 1
+	fi
 }
 alias gitleaks-scan="gitleaks_scan"
 
