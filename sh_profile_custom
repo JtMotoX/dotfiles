@@ -34,7 +34,16 @@ vsc() {
 	if [ "${relpath}" = "" ]; then relpath="$(pwd)"; fi
 	if [ ! -d "${relpath}" ]; then echo "Path not found: '${relpath}'"; return 1; fi
 	abspath="$(cd ${relpath} && pwd)"
-	echo "https://vsc:4443/?folder=${abspath}"
+	if hostname -s | grep '^vmwjjj' >/dev/null 2>&1; then
+		tunnel_url="https://vsc:4443/?folder="
+	elif systemctl --user status code-tunnel.service >/dev/null 2>&1; then
+		tunnel_name="$(cat ~/.vscode/cli/code_tunnel.json | sed -E 's/^.*\"name\":\"([^\"]*).*/\1/')"
+		tunnel_url="https://vscode.dev/tunnel/${tunnel_name}"
+	else
+		echo "Unable to determine tunnel url"
+		return 1
+	fi
+	echo "${tunnel_url}${abspath}"
 }
 
 # FUNCTION TO CALCULATE COMPRESSED DOCKER IMAGE SIZE
