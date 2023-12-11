@@ -127,6 +127,18 @@ image_secret_scanner() {
 }
 alias image-secret-scanner="image_secret_scanner"
 
+# PERFORM DIFF AGAINST BFG REPORT
+bfg_diff() {
+	map_file="$1"
+	[ "$(basename "${map_file}")" != "object-id-map.old-new.txt" ] && { echo "You need to provide the 'object-id-map.old-new.txt' file that bfg generated"; return 1; }
+	[ ! -f "${map_file}" ] && { echo "File not found: '${map_file}'"; return 1; }
+	git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { echo "You need to be in a git directory to perform this action"; return 1; }
+	echo "Comparing . . ."
+	cat "$1" | while read -r l; do eval git --no-pager diff --color=never --unified=0 $l; done | grep -E '^(\+|\-)\s' | awk '!x[$0]++' | awk '/^+/ { printf "\033[32m%s\033[0m\n", $0 } /^-/ { printf "\033[31m%s\033[0m\n", $0 }'
+	echo "Done"
+}
+alias bfg-diff=bfg_diff
+
 
 export DOCKER_BUILDKIT=1
 export BUILDKIT_PROGRESS=plain
