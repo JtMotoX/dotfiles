@@ -604,6 +604,8 @@ if type velero &>/dev/null; then
 	alias v="velero"
 fi
 
+if [ -f ~/.ansible.cfg.sh ]; then source ~/.ansible.cfg.sh; fi
+
 if type ansible-playbook &>/dev/null; then
 	export ANSIBLE_FORCE_COLOR=True
 	# alias ansible-playbook='rm -f $ANSIBLE_LOG_PATH; ansible-playbook'
