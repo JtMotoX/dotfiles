@@ -6,6 +6,11 @@
 1. Follow the setup steps at the top of the [tmux.conf](tmux.conf)
 1. Run `./create-symbolic-links.sh`
 
+If you get a `compaudit` error, run the following command:
+```bash
+compaudit | xargs chmod g-w
+```
+
 ## Install Bourne Shell (optional)
 
 Run the command below to see if you have a bourne shell:
