@@ -303,6 +303,11 @@ if test -d ~/.kube; then
 	done
 fi
 
+# macOS HOMEBREW
+if type brew >/dev/null 2>&1; then
+	export PATH="$(brew --prefix 2>/dev/null)/sbin:$PATH"
+fi
+
 # INSTALL PYENV
 	# brew install pyenv
 	# pyenv install 2.7.16

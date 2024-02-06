@@ -171,7 +171,5 @@ if [[ $(uname -m) == 'arm64' ]] && type brew &>/dev/null; then
   compinit
 fi
 
-export PATH="$(brew --prefix 2>/dev/null)/sbin:$PATH"
-
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
