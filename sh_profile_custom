@@ -20,6 +20,8 @@ export LC_CTYPE="en_US.UTF-8"
 
 alias dive='docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive:latest'
 
+alias lzd='docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock lazyteam/lazydocker'
+
 alias dfimage="docker run --rm -i -v /var/run/docker.sock:/var/run/docker.sock alpine/dfimage"
 
 alias trivy="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/aquasecurity/trivy:latest image --scanners vuln --ignore-unfixed"
@@ -32,9 +34,19 @@ alias bfg='docker run --rm -it -v "$(pwd):/work" -u $(id -u ${USER}):$(id -g ${U
 vsc() {
 	relpath="$1"
 	if [ "${relpath}" = "" ]; then relpath="$(pwd)"; fi
+	if [ -f "${relpath}" ]; then relpath="$(dirname "${relpath}")"; fi
 	if [ ! -d "${relpath}" ]; then echo "Path not found: '${relpath}'"; return 1; fi
 	abspath="$(cd ${relpath} && pwd)"
-	echo "https://vsc:4443/?folder=${abspath}"
+	if hostname -s | grep '^vmwjjj' >/dev/null 2>&1; then
+		tunnel_url="https://vsc:4443/?folder="
+	elif systemctl --user status code-tunnel.service >/dev/null 2>&1; then
+		tunnel_name="$(cat ~/.vscode/cli/code_tunnel.json | sed -E 's/^.*\"name\":\"([^\"]*).*/\1/')"
+		tunnel_url="https://vscode.dev/tunnel/${tunnel_name}"
+	else
+		echo "Unable to determine tunnel url"
+		return 1
+	fi
+	echo "${tunnel_url}${abspath}"
 }
 
 # FUNCTION TO CALCULATE COMPRESSED DOCKER IMAGE SIZE
@@ -82,12 +94,26 @@ gitleaks_scan() {
 		printf "%s " "Press enter to continue"
 		read ans
 	fi
+	TEMPDIR="$(mktemp -d)"
+	echo "TEMPDIR: ${TEMPDIR}"
+	chmod 777 "${TEMPDIR}"
 	if [ ! -f "${config_file}" ]; then
-		echo "Config file not found: ${config_file}"
-		return 1
+		echo "WARNING: Config file not found: '${config_file}'"
+		config_file="${TEMPDIR}/config.toml"
+		printf "[extend]\nuseDefault = true" >"${config_file}"
+		# return 1
 	fi
 	echo "Scanning . . ."
-	docker run --rm -v "${config_file}:/config.toml" -v "$PWD":/path -w /path ghcr.io/zricethezav/gitleaks:latest detect --config=/config.toml -v --no-git 2>/dev/null | jq -r '.File + "ø" + .Secret + "ø" + .Description' | sort | column -s 'ø' -t | uniq
+	docker run --rm -v "${config_file}:/config.toml" -v "$PWD":/path -v "${TEMPDIR}:${TEMPDIR}" -w /path ghcr.io/zricethezav/gitleaks:latest detect --config=/config.toml --no-banner -f json -r "${TEMPDIR}/results.json"
+	if cat "${TEMPDIR}/results.json" | jq -r '.[] | "Entry:" + .File + "ø" + .Secret + "ø" + .Description + "ø" + .Commit' | grep '^Entry:' | sed 's/^Entry://' | sort | column -s 'ø' -t | uniq; then
+		echo "not removing tempdir"
+		# rm -rf "${TEMPDIR}"
+	else
+		echo "There was an error parsing the results"
+		echo "Results are stored at '${TEMPDIR}/results.json'"
+		echo "Make sure to delete the results once you are finished"
+		return 1
+	fi
 }
 alias gitleaks-scan="gitleaks_scan"
 
@@ -102,6 +128,18 @@ image_secret_scanner() {
 	docker run --rm $1 env
 }
 alias image-secret-scanner="image_secret_scanner"
+
+# PERFORM DIFF AGAINST BFG REPORT
+bfg_diff() {
+	map_file="$1"
+	[ "$(basename "${map_file}")" != "object-id-map.old-new.txt" ] && { echo "You need to provide the 'object-id-map.old-new.txt' file that bfg generated"; return 1; }
+	[ ! -f "${map_file}" ] && { echo "File not found: '${map_file}'"; return 1; }
+	git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { echo "You need to be in a git directory to perform this action"; return 1; }
+	echo "Comparing . . ."
+	cat "$1" | while read -r l; do eval git --no-pager diff --color=never --unified=0 $l; done | grep -E '^(\+|\-)\s' | awk '!x[$0]++' | awk '/^+/ { printf "\033[32m%s\033[0m\n", $0 } /^-/ { printf "\033[31m%s\033[0m\n", $0 }'
+	echo "Done"
+}
+alias bfg-diff=bfg_diff
 
 
 export DOCKER_BUILDKIT=1
@@ -417,6 +455,37 @@ if type kubectl &>/dev/null; then
 		alias kn="kubens"
 	fi
 
+	# TEST ALL KUBECONFIGS
+	kx_test() {
+		ERROR_LOG_FILE="/tmp/kx_test-error.log"
+		RED='\033[0;31m'
+		GREEN='\033[0;32m'
+		BLUE='\033[0;34m'
+		NC='\033[0m' # NO COLOR
+		find ~/.kube/custom-contexts/ -name '*.config' \( -type f -o -type l \) | while read -r k; do
+			rm -f "${ERROR_LOG_FILE}"
+			CLUSTER_NAME="$(KUBECONFIG=$k kubectl config view -o jsonpath='{.clusters[].name}')"
+			PROGRESS_LINE="--- ${CLUSTER_NAME} ---"
+			tput civis # HIDE CURSOR
+			printf "${BLUE}${PROGRESS_LINE} ⏳${NC}"
+			KUBECONFIG=$k kubectl get po -n default >/dev/null 2>"${ERROR_LOG_FILE}"
+			if [ $? != 0 ] || grep -q '[^[:space:]]' "${ERROR_LOG_FILE}"; then
+				KUBECONFIG_ERROR=true
+				printf "\r\033[K${RED}${PROGRESS_LINE} ❌${NC}\n"
+				cat "${ERROR_LOG_FILE}"
+			else
+				printf "\r\033[K${GREEN}${PROGRESS_LINE} ✅${NC}\n"
+			fi
+			tput cnorm # SHOW CURSOR
+			rm -f "${ERROR_LOG_FILE}"
+		done
+		if [ "${KUBECONFIG_ERROR}" = "true" ]; then
+			return 1
+		fi
+	}
+	alias kx-test="kx_test"
+	alias kube-test="kx_test"
+
 	# KUBERNETES CLUSTER INFO
 	ki() {
 		# CLUSTER_NAME="$(kubectl get daemonset instana-agent -n instana-agent -o jsonpath='{.spec.template.spec.containers[*].env[?(@.name=="INSTANA_KUBERNETES_CLUSTER_NAME")].value}')"
@@ -427,7 +496,8 @@ if type kubectl &>/dev/null; then
 		CLUSTER_API_URL="$(echo "${CLUSTER_API_URL_FULL}" | sed -E 's/^https?:\/\///')"
 		CLUSTER_WEB_URL="$(echo "${CLUSTER_API_URL_FULL}" | sed 's|/k8s/clusters/|/dashboard/c/|')"
 		CLUSTER_PLAYBOOK_URL="$(echo "${CLUSTER_API_URL_FULL}" | sed -E 's/^https?:\/\///' | sed 's|/k8s/clusters/|/c/|')"
-		AMBASSADOR_ID="$(kubectl get host -n ambassador -o json | jq -r '.items[] | select(.metadata.name | startswith("aes-internal-host-") and endswith("-cloudone-netapp-com")) | select(.metadata.name != "aes-internal-host-cloudone-netapp-com") | .spec.hostname' | grep -o -E 'prd[0-9]+')"
+		AMBASSADOR_ID="$(kubectl get host -n ambassador -o json 2>/dev/null | jq -r '.items[] | select(.metadata.name | startswith("aes-internal-host-") and endswith("-cloudone-netapp-com")) | select(.metadata.name != "aes-internal-host-cloudone-netapp-com") | .spec.hostname' | grep -o -E 'prd[0-9]+')"
+		KONG_ID="$(k get ingress -n kong-examples -o json | jq -r '.items[] | select(.spec.ingressClassName == "kong-internal") | .spec.rules[0].host' | grep -o -E 'gw[0-9]+')"
 		NAMESPACE_CONTEXT="$(kubectl config view --minify --output 'jsonpath={..namespace}')"
 		(
 			printf "Cluster Name:~${CLUSTER_NAME}\n"
@@ -436,6 +506,7 @@ if type kubectl &>/dev/null; then
 			printf "Cluster Playbook URL:~${CLUSTER_PLAYBOOK_URL}\n"
 			printf "Cluster Schema:~${CLUSTER_SCHEMA}\n"
 			printf "Ambassador ID:~${AMBASSADOR_ID}\n"
+			printf "Kong ID:~${KONG_ID}\n"
 			printf "Namespace:~${NAMESPACE_CONTEXT}\n"
 		) | column -t -s '~'
 	}
@@ -541,6 +612,8 @@ fi
 if type velero &>/dev/null; then
 	alias v="velero"
 fi
+
+if [ -f ~/.ansible.cfg.sh ]; then source ~/.ansible.cfg.sh; fi
 
 if type ansible-playbook &>/dev/null; then
 	export ANSIBLE_FORCE_COLOR=True
