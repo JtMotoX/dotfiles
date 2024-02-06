@@ -553,6 +553,9 @@ fi
 # FIX VISUAL STUDIO CODE SERVER KEYCHAIN ERROR
 export VSCODE_CLI_USE_FILE_KEYCHAIN=1
 
+# RANCHER DESKTOP
+test -d ~/.rd/bin && export PATH="~/.rd/bin:$PATH"
+
 test -f ~/.sh_profile_local && { source ~/.sh_profile_local; } || true
 
 # sleep 0.1
