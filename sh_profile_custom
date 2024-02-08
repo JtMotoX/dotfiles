@@ -543,11 +543,14 @@ if type kubectl &>/dev/null; then
 		secret_name=$1
 		secret_data="$(kubectl get secret ${secret_name} -o json | jq -r '.data')"
 		secret_decoded='{}'
-		echo "${secret_data}" | jq -r '. | keys[]' | while read -r key; do
-			val="$(echo "${secret_data}" | jq -r --arg key $key '.[$key]' | base64 -d)"
-			secret_decoded="$(echo "${secret_decoded}" | jq --arg key "${key}" --arg val "${val}" '. += {($key): $val}')"
+		printf '%s' "${secret_data}" | jq -r '. | keys[]' | while read -r key; do
+			val="$(printf '%s' "${secret_data}" | jq -r --arg key $key '.[$key]' | base64 -d)"
+			if ! printf "%s" "${val}" | awk '/[^\x00-\x7F]/ { exit 1 }'; then
+				val="<<<non-ascii-data>>>"
+			fi
+			secret_decoded="$(printf '%s' "${secret_decoded}" | jq -n --arg key "${key}" --arg val "${val}" '. += {($key): $val}')"
 		done
-		kubectl get secret ${secret_name} -o json | jq --argjson secret_decoded "${secret_decoded}" '. | .["data"] = $secret_decoded'
+		kubectl get secret ${secret_name} -o json | jq --argjson secret_decoded "${secret_decoded}" '. | .["data"] = $secret_decoded' | jq 'del(.metadata.annotations["kubectl.kubernetes.io/last-applied-configuration"])'
 	}
 	if type compdef &>/dev/null; then
 		_ks() { _arguments "1: :($(kubectl get secret -o jsonpath='{.items[*].metadata.name}'))"; }
