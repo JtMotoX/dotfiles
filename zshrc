@@ -173,3 +173,7 @@ fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# CD REPLACEMENT
+! type zoxide >/dev/null 2>&1 || eval "$(zoxide init --cmd cd zsh)"
+[ ! -f ~/.fzf.zsh ] || source ~/.fzf.zsh
