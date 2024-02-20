@@ -1,5 +1,13 @@
 clear
 
+# START NIX-SHELL ON TERMINAL STARTUP
+if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then . ~/.nix-profile/etc/profile.d/nix.sh; fi
+if type nix-shell >/dev/null 2>&1 && [ "${NIX_STORE}" = "" ]; then
+  export SHELL_REAL="${SHELL}"
+  nix-shell --run $SHELL
+  exit $?
+fi
+
 # MANUALLY INSTALL PLUGINS AND THEMES
 # git -C ~/.oh-my-zsh/custom/plugins clone https://github.com/zsh-users/zsh-autosuggestions
 # git -C ~/.oh-my-zsh/custom/plugins clone https://github.com/zsh-users/zsh-completions
