@@ -388,11 +388,6 @@ if test -d /mnt/c; then
 	export PATH="/mnt/c/Users/jonathaf/AppData/Local/Microsoft/WindowsApps:$PATH"
 fi
 
-# RANCHER DESKTOP PATHS
-if test -d "$HOME/.rd/bin"; then
-	export PATH="$HOME/.rd/bin:$PATH"
-fi
-
 # NODE PATHS
 if test -d $HOME/.npm-packages/bin; then
 	export PATH="$HOME/.npm-packages/bin:$PATH"
