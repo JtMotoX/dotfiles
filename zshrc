@@ -1,3 +1,14 @@
+###### SETUP ######
+
+# MANUALLY INSTALL PLUGINS AND THEMES
+# git -C ~/.oh-my-zsh/custom/plugins clone https://github.com/zsh-users/zsh-autosuggestions
+# git -C ~/.oh-my-zsh/custom/plugins clone https://github.com/zsh-users/zsh-completions
+# git -C ~/.oh-my-zsh/custom/plugins clone https://github.com/zsh-users/zsh-syntax-highlighting.git
+# git -C ~/.oh-my-zsh/custom/themes clone https://github.com/romkatv/powerlevel10k.git
+# git -C ~/.oh-my-zsh/custom/themes clone https://github.com/JtMotoX/zsh-jt-themes.git
+
+################################
+
 clear
 
 # # START NIX-SHELL ON TERMINAL STARTUP
@@ -8,13 +19,6 @@ clear
 #   nix-shell --run $SHELL
 #   exit $?
 # fi
-
-# MANUALLY INSTALL PLUGINS AND THEMES
-# git -C ~/.oh-my-zsh/custom/plugins clone https://github.com/zsh-users/zsh-autosuggestions
-# git -C ~/.oh-my-zsh/custom/plugins clone https://github.com/zsh-users/zsh-completions
-# git -C ~/.oh-my-zsh/custom/plugins clone https://github.com/zsh-users/zsh-syntax-highlighting.git
-# git -C ~/.oh-my-zsh/custom/themes clone https://github.com/romkatv/powerlevel10k.git
-# git -C ~/.oh-my-zsh/custom/themes clone https://github.com/JtMotoX/zsh-jt-themes.git
 
 # LOAD TERMINAL MULTIPLEXER CONFIGURATIONS
 test -f ~/.tmux_profile && source ~/.tmux_profile
