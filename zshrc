@@ -105,12 +105,18 @@ DISABLE_MAGIC_FUNCTIONS=true
 # WHEN PERMISSIONS CANNOT BE SET CORRECTLY DUE TO SYMBOLIC LINK TO WINDOWS ONEDRIVE FOLDER
 # ZSH_DISABLE_COMPFIX=true
 
+# NEEDED FOR ZOXIDE
+export PATH="$HOME/.local/bin:$PATH"
+
+# ZOXIDE REPLACE CD COMMAND
+ZOXIDE_CMD_OVERRIDE=cd
+
 # Which plugins would you like to load?
 # Standard plugins can be found in ~/.oh-my-zsh/plugins/*
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git docker docker-compose zsh-syntax-highlighting zsh-autosuggestions zsh-completions)
+plugins=(git docker docker-compose zsh-syntax-highlighting zsh-autosuggestions zsh-completions zoxide fzf)
 # plugins=(git colored-man colorize pip python brew osx zsh-syntax-highlighting zsh-autosuggestions)
 
 source $ZSH/oh-my-zsh.sh
@@ -186,7 +192,3 @@ fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# CD REPLACEMENT
-! type zoxide >/dev/null 2>&1 || eval "$(zoxide init --cmd cd zsh)"
-[ ! -f ~/.fzf.zsh ] || source ~/.fzf.zsh
