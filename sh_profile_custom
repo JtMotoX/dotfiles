@@ -442,6 +442,9 @@ if type velero &>/dev/null; then
 	alias v="velero"
 fi
 
+# REMOVE SOME OH-MY-ZSH KUBECTL ALIASES
+unalias kl 2>/dev/null
+
 if type kubectl &>/dev/null; then
 	#alias kubectl="kubectl --insecure-skip-tls-verify"
 	alias k="kubectl --insecure-skip-tls-verify"

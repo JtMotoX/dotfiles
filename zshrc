@@ -116,7 +116,7 @@ ZOXIDE_CMD_OVERRIDE=cd
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git docker docker-compose zsh-syntax-highlighting zsh-autosuggestions zsh-completions zoxide fzf)
+plugins=(git docker docker-compose zsh-syntax-highlighting zsh-autosuggestions zsh-completions zoxide fzf kubectl)
 # plugins=(git colored-man colorize pip python brew osx zsh-syntax-highlighting zsh-autosuggestions)
 
 source $ZSH/oh-my-zsh.sh
