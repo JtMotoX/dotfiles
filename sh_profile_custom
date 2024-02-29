@@ -30,7 +30,12 @@ alias whitespace="sed 's/ /·/g;s/\t/￫/g;s/\r/§/g;s/$/¶/g'"
 
 alias bfg='docker run --rm -it -v "$(pwd):/work" -u $(id -u ${USER}):$(id -g ${USER}) jtmotox/bfg'
 
-alias glscan='docker run --rm -it -v "/tmp:/tmp" -v "$(pwd):$(pwd)" -w "$(pwd)" -u $(id -u):$(id -g) -e no_git -e secrets_in_logs docker-ngdc.repo.east1.ncloud.netapp.com/devexp-engg/gitleaks-repo-scanner:latest'
+# GITLEAKS REPO SCANNER
+if [[ "$(uname)" == "Darwin" ]]; then
+    alias glscan='docker run --rm -it -v "$HOME/Downloads:$HOME/Downloads" -v "$(pwd):$(pwd)" -w "$(pwd)" -u $(id -u):$(id -g) -e repo_scan_log_dir="$HOME/Downloads" -e no_git -e secrets_in_logs docker-ngdc.repo.east1.ncloud.netapp.com/devexp-engg/gitleaks-repo-scanner:latest'
+elif [[ "$(uname)" == "Linux" ]]; then
+	alias glscan='docker run --rm -it -v "/tmp:/tmp" -v "$(pwd):$(pwd)" -w "$(pwd)" -u $(id -u):$(id -g) -e no_git -e secrets_in_logs docker-ngdc.repo.east1.ncloud.netapp.com/devexp-engg/gitleaks-repo-scanner:latest'
+fi
 
 # FUNCTION TO GIVE VSC URL
 vsc() {
