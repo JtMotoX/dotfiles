@@ -194,4 +194,4 @@ fi
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # OVERRIDE ZOXIDE COMPLETION WITH THE DEFAULT OH-MY-ZSH COMPLETION
-compdef -d __zoxide_z
+compdef _files __zoxide_z
