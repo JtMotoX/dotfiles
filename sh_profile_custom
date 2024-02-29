@@ -30,6 +30,8 @@ alias whitespace="sed 's/ /·/g;s/\t/￫/g;s/\r/§/g;s/$/¶/g'"
 
 alias bfg='docker run --rm -it -v "$(pwd):/work" -u $(id -u ${USER}):$(id -g ${USER}) jtmotox/bfg'
 
+alias glscan='docker run --rm -it -v "/tmp:/tmp" -v "$(pwd):$(pwd)" -w "$(pwd)" -u $(id -u):$(id -g) -e no_git -e secrets_in_logs docker-ngdc.repo.east1.ncloud.netapp.com/devexp-engg/gitleaks-repo-scanner:latest'
+
 # FUNCTION TO GIVE VSC URL
 vsc() {
 	relpath="$1"
