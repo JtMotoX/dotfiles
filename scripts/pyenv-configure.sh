@@ -6,13 +6,10 @@ cd "$(dirname "$0")"
 # SET DEFAULT PYTHON VERSION
 default_python_version=${1:-"3.10.3"}
 
-# CHECK IF PYENV IS INSTALLED
-if command -v pyenv >/dev/null 2>&1; then
-	echo "pyenv is already installed"
-else
-	# INSTALL PYENV
-	echo "Installing pyenv"
-	curl https://pyenv.run | sh
+# MAKE SURE PYENV IS INSTALLED
+if ! command -v pyenv >/dev/null 2>&1; then
+	echo "Pyenv is not installed"
+	exit 1
 fi
 
 # CHECK IF PYENV-VIRTUALENV IS INSTALLED

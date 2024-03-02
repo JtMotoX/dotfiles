@@ -31,5 +31,6 @@ in
     fzf
     fzf-zsh
     tmux
+    pyenv
   ];
 }

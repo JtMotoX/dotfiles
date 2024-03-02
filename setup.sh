@@ -17,7 +17,6 @@ fi
 # INSTALL BREW IF macOS
 if [ "$(uname)" = "Darwin" ]; then ./scripts/brew-install.sh; fi
 
-./scripts/pyenv-install.sh "3.10.3"
 ./scripts/zsh-install.sh
 ./scripts/oh-my-zsh-install.sh
 ./scripts/tmux-configure.sh
@@ -34,6 +33,7 @@ fi
 if [ -f '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'; fi
 # ./scripts/nix-packages-uninstall.sh
 ./scripts/nix-packages-install.sh
+./scripts/pyenv-configure.sh "3.10.3"
 
 if ! command -v git | grep 'nix' >/dev/null 2>&1; then
     echo "The setup failed"
