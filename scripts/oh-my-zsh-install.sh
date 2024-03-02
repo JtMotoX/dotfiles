@@ -20,6 +20,7 @@ install_omz_custom() {
 	git_dir=$(basename "$2" | sed 's/\.git$//')
 	if [ -d "${git_dir}" ]; then
 		echo "Updating '$2'"
+		git -C "${git_dir}" checkout .
 		git -C "${git_dir}" pull
 	else
 		echo "Installing '$2'"
