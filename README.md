@@ -1,6 +1,6 @@
 ## Info
 
-This automatically configures the following:
+This automatically installs and configures the following:
 
 - zsh
 - oh-my-zsh
