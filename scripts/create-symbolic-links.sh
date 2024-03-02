@@ -43,7 +43,7 @@ create_link() {
 create_link ansible.cfg ~/.ansible.cfg
 create_link ansible.cfg.sh ~/.ansible.cfg.sh
 create_link bash_profile_custom ~/.bash_profile_custom
-create_link default.nix ~/default.nix
+# create_link default.nix ~/default.nix
 create_link p10k.zsh ~/.p10k.zsh
 create_link sh_profile_custom ~/.sh_profile_custom
 create_link screen_profile ~/.screen_profile
