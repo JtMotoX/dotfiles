@@ -5,6 +5,17 @@ cd "$(dirname "$0")"
 
 changed="false"
 
+if [ "$(whoami)" = "root" ]; then
+    echo "This script should not be run as root."
+    exit 1
+fi
+
+# MAKE SURE WE HAVE SUDO
+if [ "$(sudo whoami)" != "root" ]; then
+    echo "You do not seem to have sudo rights."
+    exit 1
+fi
+
 # FUNCTION TO REMOVE FILE OR FOLDER
 remove_nix_thing() {
     if ! echo "$1" | grep 'nix' >/dev/null 2>&1; then
