@@ -1,7 +1,6 @@
 ## Setup
 
-1. Follow the setup steps at the top of the [tmux.conf](configs/tmux.conf)
-1. Run `./setup.sh`
+Run `./setup.sh`
 
 ---
 

@@ -5,6 +5,7 @@ cd "$(dirname "$0")"
 
 ./scripts/zsh-install.sh
 ./scripts/oh-my-zsh-install.sh
+./scripts/tmux-configure.sh
 ./scripts/create-symbolic-links.sh
 ./scripts/nix-uninstall.sh
 for key in $(env | grep '^NIX_' | awk -F= '{print $1}'); do unset $key; done
