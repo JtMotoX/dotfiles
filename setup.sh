@@ -6,6 +6,7 @@ cd "$(dirname "$0")"
 # INSTALL BREW IF macOS
 if [ "$(uname)" = "Darwin" ]; then ./scripts/brew-install.sh; fi
 
+./scripts/pyenv-install.sh "3.10.3"
 ./scripts/zsh-install.sh
 ./scripts/oh-my-zsh-install.sh
 ./scripts/tmux-configure.sh
