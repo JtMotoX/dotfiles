@@ -3,6 +3,8 @@
 set -e
 cd "$(dirname "$0")"
 
+reload_needed="false"
+
 # UPDATE THIS REPO
 current_commit="$(git rev-parse HEAD)"
 git pull
@@ -26,6 +28,7 @@ if ! command -v nix >/dev/null 2>&1 || [ ! -f '/nix/var/nix/profiles/default/etc
     ./scripts/nix-uninstall.sh
     for key in $(env | grep '^NIX_' | awk -F= '{print $1}'); do unset $key; done
     ./scripts/nix-install.sh
+    reload_needed="true"
 fi
 
 if [ -f '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'; fi
@@ -38,4 +41,8 @@ if ! command -v git | grep 'nix' >/dev/null 2>&1; then
 fi
 
 echo
-echo "Successfully finished setup. Please reload your session."
+printf "Successfully finished setup."
+if [ "$reload_needed" = "true" ]; then
+    printf " Please reload your session."
+fi
+printf "\n"
