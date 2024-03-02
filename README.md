@@ -1,8 +1,5 @@
 ## Setup
 
-1. Install [zsh](https://github.com/ohmyzsh/ohmyzsh/wiki/Installing-ZSH#install-and-set-up-zsh-as-default)
-1. Install [oh-my-zsh](https://ohmyz.sh/#install)
-1. Manually install the plugins at the top of [zshrc](configs/zshrc) (optional)
 1. Follow the setup steps at the top of the [tmux.conf](configs/tmux.conf)
 1. Run `./setup.sh`
 
