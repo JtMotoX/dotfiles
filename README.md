@@ -1,15 +1,21 @@
 ## Setup
 
+1. Install [zsh](https://github.com/ohmyzsh/ohmyzsh/wiki/Installing-ZSH#install-and-set-up-zsh-as-default)
 1. Install [oh-my-zsh](https://ohmyz.sh/#install)
-1. Install [tmux](https://github.com/tmux/tmux/wiki/Installing#installing-tmux) (optional)
 1. Manually install the plugins at the top of [zshrc](configs/zshrc) (optional)
 1. Follow the setup steps at the top of the [tmux.conf](configs/tmux.conf)
-1. Run `./scripts/create-symbolic-links.sh`
+1. Run `./setup.sh`
+
+---
+
+## Troubleshooting
 
 If you get a `compaudit` error, run the following command:
 ```bash
 compaudit | xargs chmod g-w
 ```
+
+---
 
 ## Install Bourne Shell (optional)
 
