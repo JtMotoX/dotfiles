@@ -1,7 +1,12 @@
 ## Info
 
+This should work on **Windows** (wsl2), **macOS**, and **Linux** (any distro).
+
 This automatically installs and configures the following:
 
+- brew (*if macos*)
+- pyenv
+- python
 - zsh
 - oh-my-zsh
 - ansible
