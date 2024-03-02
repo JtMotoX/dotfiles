@@ -3,6 +3,11 @@
 set -e
 cd "$(dirname "$0")"
 
+# TEMPORARILY REMOVE TMPFS NOEXEC IT EXISTS
+if mount | grep -E '/tmp\s.*noexec' >/dev/null 2>&1; then
+    sudo mount -o remount,exec /tmp
+fi
+
 # INSTALL NIX
 echo "Installing nix . . ."
 if [ "$(uname)" = "Darwin" ]; then
