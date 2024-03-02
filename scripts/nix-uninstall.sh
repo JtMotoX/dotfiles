@@ -18,11 +18,11 @@ fi
 
 # FUNCTION TO REMOVE FILE OR FOLDER
 remove_nix_thing() {
-    if ! echo "$1" | grep 'nix' >/dev/null 2>&1; then
-        echo "ERROR: Unable to remove non-nix directory '$1'"
-        exit 1
-    fi
     sudo sh -c "ls -d "$1" 2>/dev/null"  | while read -r i; do
+        if ! echo "$i" | grep 'nix' >/dev/null 2>&1; then
+            echo "ERROR: Unable to remove non-nix directory '$i'"
+            exit 1
+        fi
         echo "Removing '$i'"
         sudo rm -rf "$i"
         changed="true"
