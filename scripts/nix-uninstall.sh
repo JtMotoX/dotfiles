@@ -29,9 +29,64 @@ remove_nix_thing() {
     done
 }
 
-if [ "$(uname)" = "Darwin" ]; then
-    echo "not yet supported"
-	exit 1
+if [ "$(uname)" = "Darwin" ]; then 
+    # SOURCE NIX CONFIGS
+    if [ -f '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'; fi
+
+    # REMOVE NIX SERVICES IF EXISTS
+    if [ -f /Library/LaunchDaemons/org.nixos.nix-daemon.plist ]; then
+        echo "Removing service 'org.nixos.nix-daemon.plist'"
+        sudo launchctl unload /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+        sudo rm /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+        changed="true"
+    fi
+    if [ -f /Library/LaunchDaemons/org.nixos.darwin-store.plist ]; then
+        echo "Removing service 'org.nixos.darwin-store.plist'"
+        sudo launchctl unload /Library/LaunchDaemons/org.nixos.darwin-store.plist
+        sudo rm /Library/LaunchDaemons/org.nixos.darwin-store.plist
+        changed="true"
+    fi
+
+    # REMOVE NIX GROUP IF EXISTS
+    if dscl . list /Groups | grep -E '^nixbld$' >/dev/null 2>&1; then
+        echo "Removing group 'nixbld'"
+        sudo dscl . -delete /Groups/nixbld
+        changed="true"
+    fi
+
+    # REMOVE NIX USERS IF EXISTS
+    for u in $(sudo dscl . -list /Users | grep _nixbld); do
+        echo "Removing user '$u'"
+        sudo dscl . -delete /Users/$u
+        changed="true"
+    done
+
+    # REMOVE NIX VOLUME MOUNT CONFIG
+    if grep -E 'nix' /etc/fstab >/dev/null 2>&1; then
+        echo "Removing '/nix' volume mount config"
+        sudo sed -i '' '/\/nix/d' /etc/fstab
+        changed="true"
+    fi
+
+    # REMOVE NIX VOLUME MOUNT CONFIG
+    if grep -E '^nix$' /etc/synthetic.conf >/dev/null 2>&1; then
+        echo "Removing 'nix' mountpoint creation config"
+        sudo sed -i '' '/^nix$/d' /etc/synthetic.conf
+        changed="true"
+    fi
+
+    # REMOVE NIX VOLUME
+    if diskutil list | grep -i ' nix ' >/dev/null 2>&1; then
+        echo "Removing 'Nix Store' volume"
+        sudo diskutil apfs deleteVolume /nix
+        changed="true"
+    fi
+
+    # MAKE SURE NIX VOLUME WAS DELETED
+    if diskutil list | grep -i ' nix ' >/dev/null 2>&1; then
+        echo "There was an error removing the 'Nix Store' volume"
+        exit 1
+    fi
 
 else
     # UNINSTALL NIX SERVICE IF ALREADY EXISTS
@@ -57,9 +112,13 @@ else
         sudo groupdel nixbld
         changed="true"
     fi
+
+    # REMOVE NIX STORE DIRECTORY
+    remove_nix_thing "/nix"
 fi
 
 # REMOVE NIX FILES THAT EXIST
+remove_nix_thing "/var/root/.nix-*"
 remove_nix_thing "/etc/bash.bashrc.backup-before-nix"
 remove_nix_thing "/etc/bashrc.backup-before-nix"
 remove_nix_thing "/etc/zsh/zshrc.backup-before-nix"
@@ -67,7 +126,6 @@ remove_nix_thing "/etc/zshrc.backup-before-nix"
 remove_nix_thing "/etc/nix"
 remove_nix_thing "/etc/profile.d/nix.sh"
 remove_nix_thing "/etc/tmpfiles.d/nix-daemon.conf"
-remove_nix_thing "/nix"
 remove_nix_thing "/root/.nix-*"
 remove_nix_thing "/root/.cache/nix"
 remove_nix_thing "/root/.cache/cached-nix-shell"
