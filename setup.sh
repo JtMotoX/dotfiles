@@ -20,7 +20,7 @@ if ! command -v nix >/dev/null 2>&1 || [ ! -f '/nix/var/nix/profiles/default/etc
 fi
 
 if [ -f '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'; fi
-./scripts/nix-packages-uninstall.sh
+# ./scripts/nix-packages-uninstall.sh
 ./scripts/nix-packages-install.sh
 
 if ! command -v git | grep 'nix' >/dev/null 2>&1; then
