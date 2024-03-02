@@ -19,7 +19,6 @@ check_create_needed() {
 }
 
 create_link() {
-	echo
 	check_create_needed "$1" "$2" && { return 0; }
 	echo "Creating link: '$1' -> '$2'"
 	if [ ! -d "$(dirname "$1")" ]; then
