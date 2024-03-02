@@ -3,6 +3,15 @@
 set -e
 cd "$(dirname "$0")"
 
+# UPDATE THIS REPO
+current_commit="$(git rev-parse HEAD)"
+git pull
+new_commit="$(git rev-parse HEAD)"
+if [ "$current_commit" != "$new_commit" ]; then
+    echo "Some changes were made to this repo. Please run the script again."
+    exit 1
+fi
+
 # INSTALL BREW IF macOS
 if [ "$(uname)" = "Darwin" ]; then ./scripts/brew-install.sh; fi
 
@@ -28,4 +37,5 @@ if ! command -v git | grep 'nix' >/dev/null 2>&1; then
     exit 1
 fi
 
+echo
 echo "Successfully finished setup. Please reload your session."
