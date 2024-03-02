@@ -1,3 +1,17 @@
+## Info
+
+This automatically configures the following:
+
+- zsh
+- oh-my-zsh
+- ansible
+- vim
+- nix
+- *all the packages listed in [packages.nix](configs/packages.nix)*
+- *all the aliases and functions listed in [sh_profile_custom](configs/sh_profile_custom)*
+
+---
+
 ## Setup
 
 Run `./setup.sh`
