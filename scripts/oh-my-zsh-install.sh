@@ -5,6 +5,24 @@ cd "$(dirname "$0")"
 
 rm -rf "$(cd ~ && pwd)/.cache/"p10k-* || true
 
+# GET ZSH SITE FUNCTIONS DIRECTORY FOR COMPAUDIT FIX
+if [ -d /usr/share/zsh/site-functions ]; then
+	zsh_site_functions_dir="/usr/share/zsh/site-functions"
+elif [ -d "" ]; then
+	zsh_site_functions_dir="/usr/local/share/zsh/site-functions"
+else
+	echo "WARN: Unable to determine zsh site functions directory"
+fi
+
+# ATTEMPT TO FIX COMPAUDIT ERRORS IF EXISTS
+if [ "${zsh_site_functions_dir}" != "" ]; then
+	sudo chmod 755 "${zsh_site_functions_dir}"
+	sudo chown root:root "${zsh_site_functions_dir}"
+	compaudit 2>/dev/null | while read -r p; do
+		sudo chmod g-w "$p"
+	done
+fi
+
 # INSTALL OR UPDATE OH-MY-ZSH
 if [ -d ~/.oh-my-zsh ]; then
 	echo "Updating oh-my-zsh"
