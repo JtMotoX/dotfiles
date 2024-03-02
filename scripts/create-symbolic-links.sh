@@ -1,6 +1,8 @@
 #!/bin/sh
 
+set -e
 cd "$(dirname "$0")"
+cd ../configs
 
 check_create_needed() {
 	[ "$(readlink -f $1)" = "$(readlink -f $2)" ] && { echo "'$1' is already linked"; return 0; }

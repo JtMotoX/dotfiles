@@ -2,9 +2,9 @@
 
 1. Install [oh-my-zsh](https://ohmyz.sh/#install)
 1. Install [tmux](https://github.com/tmux/tmux/wiki/Installing#installing-tmux) (optional)
-1. Manually install the plugins at the top of [zshrc](zshrc) (optional)
-1. Follow the setup steps at the top of the [tmux.conf](tmux.conf)
-1. Run `./create-symbolic-links.sh`
+1. Manually install the plugins at the top of [zshrc](configs/zshrc) (optional)
+1. Follow the setup steps at the top of the [tmux.conf](configs/tmux.conf)
+1. Run `./scripts/create-symbolic-links.sh`
 
 If you get a `compaudit` error, run the following command:
 ```bash
