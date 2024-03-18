@@ -63,5 +63,5 @@ docker run --rm -it -v "$(pwd):/dotfiles:ro" archlinux sh -c "pacman -Syu --noco
 Alma:
 
 ```bash
-docker run --rm -it -v "$(pwd):/dotfiles:ro" almalinux sh -c "yum -y update && yum -y install sudo && if ! getent group $(id -g) >/dev/null 2>&1; then groupadd -g $(id -g) mygroup; fi && useradd -m -u $(id -u) -g $(id -g) -N -s \$(command -v bash) myuser && echo 'myuser ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/myuser && chmod 0440 /etc/sudoers.d/myuser && ln -s /dotfiles /home/myuser/dotfiles && chown -R myuser:mygroup /home/myuser/dotfiles && su - myuser"
+docker run --rm -it -v "$(pwd):/dotfiles:ro" almalinux sh -c "yum install -y sudo && sed -i -E 's/^((UID|GID)_MIN\s*).*$/\11/' /etc/login.defs && if ! getent group $(id -g) >/dev/null 2>&1; then groupadd -g $(id -g) mygroup; fi && useradd -m -u $(id -u) -g $(id -g) -N -s \$(command -v bash) myuser && echo 'myuser ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/myuser && chmod 0440 /etc/sudoers.d/myuser && ln -s /dotfiles /home/myuser/dotfiles && su - myuser"
 ```
