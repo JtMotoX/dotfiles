@@ -16,11 +16,14 @@ fi
 
 # ATTEMPT TO FIX COMPAUDIT ERRORS IF EXISTS
 if [ "${zsh_site_functions_dir}" != "" ]; then
-	sudo chmod 755 "${zsh_site_functions_dir}"
-	sudo chown root:root "${zsh_site_functions_dir}"
-	compaudit 2>/dev/null | while read -r p; do
-		sudo chmod g-w "$p"
-	done
+	if ! zsh --no-rcs -c "autoload -Uz compinit && compinit && compaudit" >/dev/null 2>&1; then
+		echo "Attempting to fix compaudit errors"
+		sudo chmod 755 "${zsh_site_functions_dir}"
+		sudo chown root:root "${zsh_site_functions_dir}"
+		zsh --no-rcs -c "autoload -Uz compinit && compinit && compaudit" 2>/dev/null | while read -r p; do
+			sudo chmod g-w "$p"
+		done
+	fi
 fi
 
 # INSTALL OR UPDATE OH-MY-ZSH

@@ -228,7 +228,7 @@ saveexec() {
 		echo "You must install 'inotifywait' for linux or 'fswatch' for macos."
 		return 1
 	fi
-	local SHELL="${SHELL:-$(which sh)}"
+	local SHELL="${SHELL:-$(command -v sh)}"
 	"${SHELL}" -c "env >/tmp/fake.txt"
 	local WATCH="$1"
 	shift
@@ -339,7 +339,6 @@ test -e "${HOME}/.iterm2_shell_integration.bash" && { source "${HOME}/.iterm2_sh
 # TO SWITCH CONTEXTS AND NAMESPACES USE https://github.com/ahmetb/kubectx
 if test -d ~/.kube; then
 	export KUBECONFIG=~/.kube/config
-	mkdir -p "$(dirname "$KUBECONFIG")"
 	touch "$KUBECONFIG"
 	mkdir -p ~/.kube/custom-contexts
 	for file in $(find ~/.kube/custom-contexts/ -name '*.config' \( -type f -o -type l \)); do
@@ -639,6 +638,9 @@ export VSCODE_CLI_USE_FILE_KEYCHAIN=1
 test -d ~/.rd/bin && export PATH="$(cd ~ && pwd)/.rd/bin:$PATH"
 
 test -f ~/.sh_profile_local && { source ~/.sh_profile_local; } || true
+
+# ENABLE COLORS
+TERM=xterm-256color
 
 # sleep 0.1
 # clear

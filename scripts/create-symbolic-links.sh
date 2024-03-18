@@ -4,10 +4,33 @@ set -e
 cd "$(dirname "$0")"
 cd ../configs
 
+# Parse command line arguments
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--override)
+			OVERRIDE=true
+			shift
+			;;
+		--help)
+			echo "Usage: $0 [--override]"
+			exit 0
+			;;
+		*)
+			break
+			;;
+	esac
+done
+
+# Check if the link already exists and prompt for override if necessary
 check_create_needed() {
 	[ "$(readlink -f $1)" = "$(readlink -f $2)" ] && { echo "'$1' is already linked"; return 0; }
 	test -f "$2" || { rm -f "$2"; return 1; }
-	echo "'$2' already exsits."
+	echo "'$2' already exists."
+	if [ "${OVERRIDE}" = true ]; then
+		echo "Replacing '$2' since --override was specified"
+		rm -f "$2"
+		return 1
+	fi
 	while true; do
 		read -p "Do you want to replace this with '$1'? [y/n]" yn
 		case $yn in
@@ -18,6 +41,7 @@ check_create_needed() {
 	done
 }
 
+# Create symbolic link
 create_link() {
 	check_create_needed "$1" "$2" && { return 0; }
 	echo "Creating link: '$1' -> '$2'"

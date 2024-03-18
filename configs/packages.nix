@@ -31,6 +31,29 @@ in
     fzf
     fzf-zsh
     tmux
+    # PYTHON & DEPENDENCIES
+    python3Full
+    python3Packages.pip
+    python3Packages.virtualenv
+    # python3Packages.tkinter
     pyenv
+    # gcc
+    # gnumake
+    # zlib
+    # zlib.dev
+    # zlib.out
+    # pkgconfig haskell.compiler.ghc8107
+    # ccls
+    # pkg-config
+    # python3Packages.pyramid
+    # openssl
+    # xz
+
+    # gdbm
+    # lzma
+    # tk
+    # readline
+    # setuptools
+    ###
   ];
 }

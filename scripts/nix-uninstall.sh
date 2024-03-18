@@ -5,6 +5,7 @@ cd "$(dirname "$0")"
 
 changed="false"
 
+# MAKE SURE WE ARE NOT ROOT
 if [ "$(whoami)" = "root" ]; then
     echo "This script should not be run as root."
     exit 1
@@ -31,6 +32,7 @@ remove_nix_thing() {
 
 if [ "$(uname)" = "Darwin" ]; then 
     # SOURCE NIX CONFIGS
+    if [ -f ~/.nix-profile/etc/profile.d/nix.sh ]; then . ~/.nix-profile/etc/profile.d/nix.sh; fi
     if [ -f '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'; fi
 
     # REMOVE NIX SERVICES IF EXISTS
@@ -90,12 +92,14 @@ if [ "$(uname)" = "Darwin" ]; then
 
 else
     # UNINSTALL NIX SERVICE IF ALREADY EXISTS
-    if [ "$(systemctl list-unit-files | grep -c nix-daemon.service)" -eq 1 ]; then
-        echo "Removing nix-daemon.service"
-        sudo systemctl stop nix-daemon.service
-        sudo systemctl disable nix-daemon.socket nix-daemon.service
-        sudo systemctl daemon-reload
-        changed="true"
+    if command -v systemctl >/dev/null 2>&1; then
+        if [ "$(systemctl list-unit-files | grep -c nix-daemon.service)" -eq 1 ]; then
+            echo "Removing nix-daemon.service"
+            sudo systemctl stop nix-daemon.service
+            sudo systemctl disable nix-daemon.socket nix-daemon.service
+            sudo systemctl daemon-reload
+            changed="true"
+        fi
     fi
 
     # REMOVE NIX USERS IF EXISTS
