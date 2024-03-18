@@ -1,6 +1,7 @@
 #!/bin/sh
 
 set -e
+ORIGINAL_DIR="$(pwd)"
 cd "$(dirname "$0")"
 
 # SET SOME DEFAULTS
@@ -176,8 +177,7 @@ install_package zsh
 ./scripts/pyenv-configure.sh "3.10.3"
 
 echo
-printf "Successfully finished dotfiles setup."
-if [ "$reload_needed" = "true" ]; then
-    printf " Please reload your session."
-fi
-printf "\n"
+echo "Successfully finished dotfiles setup."
+echo "Launching zsh session . . ."
+cd "${ORIGINAL_DIR}"
+NO_ZSH_CLEAR=true zsh
