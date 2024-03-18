@@ -26,7 +26,7 @@ if [ "$(uname)" = "Darwin" ]; then
 	macos_major_version="$(echo "${macos_version}" | cut -d. -f1)"
 	macos_minor_version="$(echo "${macos_version}" | cut -d. -f2)"
 	if [ "${macos_major_version}" -lt 10 ] || ( [ "${macos_major_version}" -eq 10 ] && [ "${macos_minor_version}" -lt 15 ] ); then
-		echo "MacOS version 10.15.7 and later is supported"
+		echo "MacOS version 10.15 and later is supported"
 		echo "You are using ${macos_version}"
 		exit 1
 	fi
