@@ -31,6 +31,12 @@ in
     fzf
     fzf-zsh
     tmux
+    util-linux # chsh
+    ncurses # clear
+    inetutils # hostname, ping, ifconfig, telnet, etc..
+    bash
+    which
+    dash
     # PYTHON & DEPENDENCIES
     python3Full
     python3Packages.pip
@@ -44,7 +50,7 @@ in
     # zlib.out
     # pkgconfig haskell.compiler.ghc8107
     # ccls
-    # pkg-config
+    pkg-config
     # python3Packages.pyramid
     # openssl
     # xz

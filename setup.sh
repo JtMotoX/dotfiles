@@ -142,12 +142,6 @@ reload_needed="false"
 # INSTALL NIX DEPENDENCIES
 install_package xz || install_package xz-utils
 install_package curl
-install_package bash
-install_package pkg-config || install_package pkgconfig # NEEDED FOR PYENV
-check_command clear || install_package ncurses
-check_command chsh || install_package util-linux-user
-check_command hostname || install_package inetutils
-# check_command groupadd || install_package shadow # NOT SURE WHAT THIS WAS FOR
 
 # INSTALL NIX IF NOT EXISTS
 load_nix_env

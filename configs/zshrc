@@ -10,8 +10,6 @@
 
 ################################
 
-clear
-
 # # START NIX-SHELL ON TERMINAL STARTUP
 # if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then . ~/.nix-profile/etc/profile.d/nix.sh; fi
 # if type nix-shell >/dev/null 2>&1 && [ -f ~/default.nix ] && [ "${NIX_STORE}" = "" ]; then
@@ -27,6 +25,8 @@ if [ -f '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
 elif [ -f ~/.nix-profile/etc/profile.d/nix.sh ]; then
     . ~/.nix-profile/etc/profile.d/nix.sh
 fi
+
+clear
 
 # LOAD TERMINAL MULTIPLEXER CONFIGURATIONS
 test -f ~/.tmux_profile && source ~/.tmux_profile

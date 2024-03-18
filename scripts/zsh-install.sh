@@ -9,5 +9,5 @@ if ! echo "${SHELL}" | grep -E 'zsh$' >/dev/null; then
 	if ! cat /etc/shells | grep -E "$(command -v zsh)" >/dev/null; then
 		sudo sh -c "echo $(command -v zsh) >> /etc/shells"
 	fi
-	sudo chsh -s $(command -v zsh) $(whoami)
+	sudo $(command -v chsh) -s $(command -v zsh) $(whoami)
 fi
