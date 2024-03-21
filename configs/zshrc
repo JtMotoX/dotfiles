@@ -30,10 +30,13 @@ if [ "${NO_ZSH_CLEAR}" != "true" ]; then
   clear
 fi
 
-# UPDATE DOTFILES
-dotfiles_dir="$(git -C "$(dirname "$(ls -l ~/.zshrc 2>/dev/null | awk -F" -> " '{print $2}')")" rev-parse --show-toplevel 2>/dev/null)"
-if [ "${dotfiles_dir}" != '' ] && [ -f "${dotfiles_dir}/scripts/update-dotfiles.sh" ]; then
-    "${dotfiles_dir}/scripts/update-dotfiles.sh"
+# CHECK FOR DOTFILES UPDATES ONCE A DAY
+if [ ! -f /tmp/.dotfilesupdatecheck ] || [ "$(($(date +%s) - $(stat -c %Y /tmp/.dotfilesupdatecheck)))" -gt 86400 ]; then
+	dotfiles_dir="$(git -C "$(dirname "$(ls -l ~/.zshrc 2>/dev/null | awk -F" -> " '{print $2}')")" rev-parse --show-toplevel 2>/dev/null)"
+	if [ "${dotfiles_dir}" != '' ] && [ -f "${dotfiles_dir}/scripts/update-dotfiles.sh" ]; then
+		"${dotfiles_dir}/scripts/update-dotfiles.sh"
+	fi
+	touch /tmp/.dotfilesupdatecheck
 fi
 
 # LOAD TERMINAL MULTIPLEXER CONFIGURATIONS
