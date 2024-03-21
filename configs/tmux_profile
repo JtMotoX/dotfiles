@@ -1,6 +1,8 @@
 # TMUX (the oh-my-zsh tmux plugin will conflict with this)
 if command -v tmux >/dev/null 2>&1; then
-	export TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins"
+	if [ -d "$HOME/.tmux/plugins/tpm" ]; then
+		export TMUX_PLUGIN_MANAGER_PATH="$HOME/.tmux/plugins"
+	fi
 	is_tmux() { ! test -z ${TMUX+x}; }
 	tl() { tmux ls; }
 	tks() { tmux kill-server; }
