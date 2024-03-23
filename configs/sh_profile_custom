@@ -350,8 +350,9 @@ kube_reload() {
 	done
 	[ "${silent}" = "false" ] && { echo "Reloading kubeconfigs . . ."; }
 	if test -d ~/.kube; then
-		export KUBECONFIG=~/.kube/config
-		touch "$KUBECONFIG"
+		export KUBECONFIG=""
+		KUBECONFIG_REAL=~/.kube/config
+		touch "${KUBECONFIG_REAL}"
 		custom_contexts_dir=~/.kube/custom-contexts
 		mkdir -p ~/.kube/custom-contexts
 		custom_contexts_dir="$(cd "${custom_contexts_dir}" && pwd)"
@@ -359,11 +360,15 @@ kube_reload() {
 		for file in $(find ~/.kube/custom-contexts/ -name '*.config' \( -type f -o -type l \)); do
 			[ "${silent}" = "false" ] && { printf "\t${file}\n" | sed -E "s|${custom_contexts_dir}|\.|"; }
 			file="$(echo "${file}" | sed "s/\/\//\//")" # replace double slashes to single
-			export KUBECONFIG="$KUBECONFIG:${file}"
+			export KUBECONFIG="${KUBECONFIG}:${file}"
 		done
-		kubectl config view --raw >~/.kube/config
-		export KUBECONFIG=~/.kube/config
-		[ "${silent}" = "false" ] && { echo "All contexts successfully joined into '${KUBECONFIG}'"; }
+		if [ "${KUBECONFIG}" = "" ]; then
+			[ "${silent}" = "false" ] && { echo "No custom kubeconfigs found"; }
+		else
+			kubectl config view --raw >"${KUBECONFIG_REAL}"
+			[ "${silent}" = "false" ] && { echo "All contexts successfully joined into '${KUBECONFIG_REAL}'"; }
+		fi
+		export KUBECONFIG="${KUBECONFIG_REAL}"
 	fi
 	return 0
 }
