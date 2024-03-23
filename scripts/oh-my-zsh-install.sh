@@ -3,6 +3,8 @@
 set -e
 cd "$(dirname "$0")"
 
+ZSH="${ZSH:-$HOME/.oh-my-zsh}"
+
 rm -rf "$(cd ~ && pwd)/.cache/"p10k-* || true
 
 # GET ZSH SITE FUNCTIONS DIRECTORY FOR COMPAUDIT FIX
@@ -27,23 +29,26 @@ if [ "${zsh_site_functions_dir}" != "" ]; then
 fi
 
 # INSTALL OR UPDATE OH-MY-ZSH
-if [ -d ~/.oh-my-zsh ]; then
+if [ -d "${ZSH}" ]; then
 	echo "Updating oh-my-zsh"
-	git -C ~/.oh-my-zsh pull
+	git -C "${ZSH}" pull
 else
 	echo "Installing oh-my-zsh"
 	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
 fi
 
+# UPDATE ALL OH-MY-ZSH CUSTOM PLUGINS AND THEMES
+echo "Updating oh-my-zsh custom plugins and themes"
+find "${ZSH}/custom" -type d -name .git | while read -r git_dir; do
+	echo "Updating '$(basename $(dirname ${git_dir}))'"
+	git -C "$(dirname "${git_dir}")" pull
+done
+
 # FUNCTION TO INSTALL OR UPDATE OH-MY-ZSH CUSTOM PLUGINS AND THEMES
 install_omz_custom() {
-	cd ~/.oh-my-zsh/custom/$1
+	cd "${ZSH}/custom/$1"
 	git_dir=$(basename "$2" | sed 's/\.git$//')
-	if [ -d "${git_dir}" ]; then
-		echo "Updating '$2'"
-		git -C "${git_dir}" checkout .
-		git -C "${git_dir}" pull
-	else
+	if [ ! -d "${git_dir}" ]; then
 		echo "Installing '$2'"
 		git clone "$2"
 	fi
