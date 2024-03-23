@@ -55,3 +55,4 @@ install_omz_custom plugins https://github.com/zsh-users/zsh-completions
 install_omz_custom plugins https://github.com/zsh-users/zsh-syntax-highlighting.git
 install_omz_custom themes https://github.com/romkatv/powerlevel10k.git
 install_omz_custom themes https://github.com/JtMotoX/zsh-jt-themes.git
+install_omz_custom plugins https://github.com/ahmetb/kubectx.git

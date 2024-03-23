@@ -62,6 +62,10 @@ eval "$(zoxide init --cmd cd zsh)"
 # Path to your oh-my-zsh installation.
 export ZSH="${HOME}/.oh-my-zsh"
 
+# LOAD KUBECTX AND KUBENS COMPLETIONS
+kubens_completion_dir="${ZSH}/custom/plugins/kubectx/completion"
+[ -d "${kubens_completion_dir}" ] && fpath+="${kubens_completion_dir}"
+
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
