@@ -18,6 +18,15 @@ if [ "${dotfiles_dir}" != '' ] && git -C "${dotfiles_dir}" remote get-url origin
         echo "There are updates for $(basename "${dotfiles_dir}")"
         echo "Updating $(basename "${dotfiles_dir}") . . ."
         git -C "${dotfiles_dir}" pull
-		echo "You will need to restart your session for the changes to take effect."
+        setup_script="${dotfiles_dir}/setup.sh"
+		echo "You will need to restart your session for some of the changes to take effect."
+        printf "After restarting your ssssion, it is recommended to run the setup script again"
+        if [ -f "${setup_script}" ]; then
+            HOME="${HOME:=$(cd ~ && pwd)}"
+            printf ":\n\t$( echo "${setup_script}" | sed "s|${HOME}|~|" )"
+        else
+            printf "."
+        fi
+        printf "\n"
     fi
 fi
