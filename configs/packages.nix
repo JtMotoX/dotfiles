@@ -23,6 +23,7 @@ in
     git
     kind
     kubectl_pin.kubectl
+    kubectx
     yq-go
     jq
     velero_pin.velero
