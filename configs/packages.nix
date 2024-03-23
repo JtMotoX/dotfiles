@@ -37,6 +37,7 @@ in
     bash
     which
     dash
+    gh
     # PYTHON & DEPENDENCIES
     python3Full
     python3Packages.pip
