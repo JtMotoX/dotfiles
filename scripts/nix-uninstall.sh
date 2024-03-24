@@ -77,18 +77,18 @@ if [ "$(uname)" = "Darwin" ]; then
         changed="true"
     fi
 
-    # REMOVE NIX VOLUME
-    if diskutil list | grep -i ' nix ' >/dev/null 2>&1; then
-        echo "Removing 'Nix Store' volume"
-        sudo diskutil apfs deleteVolume /nix
-        changed="true"
-    fi
+    # # REMOVE NIX VOLUME
+    # if diskutil list | grep -i ' nix ' >/dev/null 2>&1; then
+    #     echo "Removing 'Nix Store' volume"
+    #     sudo diskutil apfs deleteVolume /nix
+    #     changed="true"
+    # fi
 
-    # MAKE SURE NIX VOLUME WAS DELETED
-    if diskutil list | grep -i ' nix ' >/dev/null 2>&1; then
-        echo "There was an error removing the 'Nix Store' volume"
-        exit 1
-    fi
+    # # MAKE SURE NIX VOLUME WAS DELETED
+    # if diskutil list | grep -i ' nix ' >/dev/null 2>&1; then
+    #     echo "There was an error removing the 'Nix Store' volume"
+    #     exit 1
+    # fi
 
 else
     # UNINSTALL NIX SERVICE IF ALREADY EXISTS
