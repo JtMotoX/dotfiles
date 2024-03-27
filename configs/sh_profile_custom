@@ -615,8 +615,8 @@ if type kubectl &>/dev/null; then
 			echo "You need to specify the namespace search filter"
 			return 1
 		fi
-		ls ~/.kube/custom-contexts/netapp/*.config | while read -r KUBECONFIG_FILE; do
-			NS_RESULTS="$(KUBECONFIG="${KUBECONFIG_FILE}" kubectl get ns | grep ${SEARCH_NS} | awk '{print $1}')"
+		find ~/.kube/custom-contexts -name "*.config" -type f | while read -r KUBECONFIG_FILE; do
+			NS_RESULTS="$(KUBECONFIG="${KUBECONFIG_FILE}" kubectl get ns | awk '{print $1}' | grep ${SEARCH_NS})"
 			if [ "${NS_RESULTS}" != "" ]; then
 				CURRENT_CONTEXT="$(KUBECONFIG="${KUBECONFIG_FILE}" kubectl config current-context)"
 				NS_RESULTS_COMBINED="$(echo "${NS_RESULTS_COMBINED}\n${NS_RESULTS}" | sed -e '/^$/d')"
