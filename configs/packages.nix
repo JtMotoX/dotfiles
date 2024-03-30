@@ -21,6 +21,7 @@ in
 {
   environment.systemPackages = with pkgs; [
     git
+    git-crypt
     kind
     kubectl_pin.kubectl
     kubectx
