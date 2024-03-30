@@ -28,6 +28,7 @@ in
     jq
     velero_pin.velero
     docker
+    docker-compose
     zoxide
     fzf
     fzf-zsh
