@@ -168,7 +168,7 @@ if [ "$(uname)" = "Darwin" ]; then
         xcode-select --install
     fi
 fi
-./scripts/bourne-sh-install.sh
+# ./scripts/bourne-sh-install.sh
 install_package zsh
 ./scripts/zsh-install.sh
 ./scripts/oh-my-zsh-install.sh
