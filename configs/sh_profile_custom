@@ -339,37 +339,58 @@ test -e "${HOME}/.iterm2_shell_integration.bash" && { source "${HOME}/.iterm2_sh
 # TO SWITCH CONTEXTS AND NAMESPACES USE https://github.com/ahmetb/kubectx
 kube_reload() {
 	trap 'trap - ERR; return' ERR
+	if ! command -v kubectl >/dev/null 2>&1; then echo "kubectl is not installed"; return 1; fi
+	if ! command -v kubectx >/dev/null 2>&1 || ! command -v kubens >/dev/null 2>&1; then echo "kubectx/kubens is not installed"; return 1; fi
 	silent="false"
 	while [ $# -gt 0 ]; do
 		case "$1" in
-			-s|--silent) silent="true" ;;
-			-h|--help) echo "Usage: kube-reload [-s|--silent]"; return 0 ;;
+			-s|--silent) local silent="true" ;;
+			-f|--fresh) local fresh="true" ;;
+			-h|--help) echo "Usage: kube-reload [-s|--silent] [-f|--fresh]"; return 0 ;;
 			*) echo "Invalid option: $1"; echo "Usage: kube-reload [-s|--silent]"; return 1 ;;
 		esac
 		shift
 	done
 	[ "${silent}" = "false" ] && { echo "Reloading kubeconfigs . . ."; }
-	if test -d ~/.kube; then
-		export KUBECONFIG=""
-		KUBECONFIG_REAL=~/.kube/config
-		touch "${KUBECONFIG_REAL}"
-		custom_contexts_dir=~/.kube/custom-contexts
-		mkdir -p ~/.kube/custom-contexts
-		custom_contexts_dir="$(cd "${custom_contexts_dir}" && pwd)"
-		[ "${silent}" = "false" ] && { echo "Custom Contexts Directory: '${custom_contexts_dir}'"; }
-		for file in $(find ~/.kube/custom-contexts/ -name '*.config' \( -type f -o -type l \)); do
-			[ "${silent}" = "false" ] && { printf "\t${file}\n" | sed -E "s|${custom_contexts_dir}|\.|"; }
-			file="$(echo "${file}" | sed "s/\/\//\//")" # replace double slashes to single
-			export KUBECONFIG="${KUBECONFIG}:${file}"
-		done
-		if [ "${KUBECONFIG}" = "" ]; then
-			[ "${silent}" = "false" ] && { echo "No custom kubeconfigs found"; }
-		else
-			kubectl config view --raw >"${KUBECONFIG_REAL}"
-			[ "${silent}" = "false" ] && { echo "All contexts successfully joined into '${KUBECONFIG_REAL}'"; }
-		fi
-		export KUBECONFIG="${KUBECONFIG_REAL}"
+	if ! test -d ~/.kube; then
+		[ "${silent}" = "false" ] && { echo "No kubeconfig directory found"; }
+		return 0
 	fi
+	export KUBECONFIG=~/.kube/config
+	local KUBECONFIG_LIST=""
+	local KUBECONFIG_MD5_FILE=~/.kube/.md5
+	local KUBECONFIG_TMP1_FILE=/tmp/kubeconfig1
+	local KUBECONFIG_TMP2_FILE=/tmp/kubeconfig2
+	touch "${KUBECONFIG}"
+	touch "${KUBECONFIG_MD5_FILE}"
+	local custom_contexts_dir=~/.kube/custom-contexts
+	mkdir -p ~/.kube/custom-contexts
+	local custom_contexts_dir="$(cd "${custom_contexts_dir}" && pwd)"
+	[ "${silent}" = "false" ] && { echo "Custom Contexts Directory: '${custom_contexts_dir}'"; }
+	for file in $(find ~/.kube/custom-contexts/ -name '*.config' \( -type f -o -type l \)); do
+		[ "${silent}" = "false" ] && { printf "\t${file}\n" | sed -E "s|${custom_contexts_dir}|\.|"; }
+		local file="$(echo "${file}" | sed "s/\/\//\//")" # replace double slashes to single
+		local KUBECONFIG_LIST="${KUBECONFIG_LIST}:${file}"
+	done
+	if [ "${KUBECONFIG_LIST}" = "" ]; then
+		[ "${silent}" = "false" ] && { echo "No custom kubeconfigs found"; }
+		return 0
+	fi
+	KUBECONFIG="${KUBECONFIG_LIST}" kubectl config view --raw --flatten | sed -E '/^\s*(current-context|namespace):/d' >"${KUBECONFIG_TMP1_FILE}"
+	local KUBECONFIG_MD5="$(md5sum "${KUBECONFIG_TMP1_FILE}" | awk '{print $1}')"
+	if [ "${fresh}" = "true" ]; then
+		echo "" >"${KUBECONFIG_MD5_FILE}"
+		[ "${silent}" = "false" ] && { echo "Creating fresh kubeconfig file"; }
+	fi
+	local KUBECONFIG_MD5_OLD="$(cat ${KUBECONFIG_MD5_FILE})"
+	if [ "${KUBECONFIG_MD5}" = "${KUBECONFIG_MD5_OLD}" ]; then
+		rm -f "${KUBECONFIG_TMP1_FILE}"
+		[ "${silent}" = "false" ] && { echo "No changes detected"; }
+		return 0
+	fi
+	mv "${KUBECONFIG_TMP1_FILE}" "${KUBECONFIG}"
+	echo "${KUBECONFIG_MD5}" >"${KUBECONFIG_MD5_FILE}"
+	[ "${silent}" = "false" ] && { echo "All contexts successfully joined into '${KUBECONFIG}'"; }
 	return 0
 }
 alias kube-reload="kube_reload"
