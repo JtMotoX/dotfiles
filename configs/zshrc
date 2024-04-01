@@ -25,6 +25,9 @@ if [ -f '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
 elif [ -f ~/.nix-profile/etc/profile.d/nix.sh ]; then
     . ~/.nix-profile/etc/profile.d/nix.sh
 fi
+# FIX NIX LOCALE ERRORS - requires pkgs.glibcLocales
+export LOCALE_ARCHIVE="$(nix-env --installed --no-name --out-path --query glibc-locales)/lib/locale/locale-archive"
+
 
 if [ "${NO_ZSH_CLEAR}" != "true" ]; then
   clear

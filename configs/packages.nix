@@ -41,6 +41,7 @@ in
     which
     dash
     gh
+    glibcLocales
     # PYTHON & DEPENDENCIES
     python3Full
     python3Packages.pip
