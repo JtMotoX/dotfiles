@@ -26,8 +26,11 @@ elif [ -f ~/.nix-profile/etc/profile.d/nix.sh ]; then
     . ~/.nix-profile/etc/profile.d/nix.sh
 fi
 # FIX NIX LOCALE ERRORS - requires pkgs.glibcLocales
-export LOCALE_ARCHIVE="$(nix-env --installed --no-name --out-path --query glibc-locales)/lib/locale/locale-archive"
-
+glibc_locales_install_path="$(nix-env --installed --no-name --out-path --query glibc-locales 2>/dev/null)"
+if [ "${glibc_locales_install_path}" != '' ]; then
+    export LOCALE_ARCHIVE="${glibc_locales_install_path}/lib/locale/locale-archive"
+fi
+unset glibc_locales_install_path
 
 if [ "${NO_ZSH_CLEAR}" != "true" ]; then
   clear
