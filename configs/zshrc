@@ -32,12 +32,10 @@ if [ "${glibc_locales_install_path}" != '' ]; then
 fi
 unset glibc_locales_install_path
 
-if [ "${NO_ZSH_CLEAR}" != "true" ]; then
-  clear
-fi
+[ "${NO_ZSH_CLEAR}" != "true" ] && clear
 
 # CHECK FOR DOTFILES UPDATES ONCE A DAY
-(cd "$(dirname "$(ls -l "$0" | awk -F" -> " '{print $2}')")" && "../scripts/update-dotfiles.sh" &)
+(cd "$(dirname "$(ls -l "$HOME/.zshrc" | awk -F" -> " '{print $2}')")" && "../scripts/update-dotfiles.sh" &)
 
 # LOAD TERMINAL MULTIPLEXER CONFIGURATIONS
 test -f ~/.tmux_profile && source ~/.tmux_profile
