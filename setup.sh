@@ -174,6 +174,7 @@ install_package zsh
 ./scripts/oh-my-zsh-install.sh
 ./scripts/tmux-configure.sh
 ./scripts/create-symbolic-links.sh --override
+./scripts/dcomp-install.sh
 ./scripts/pyenv-configure.sh "3.10.3"
 
 echo
