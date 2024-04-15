@@ -15,10 +15,13 @@ else
 fi
 
 # CREATE SYMLINK
-if [ -f "${HOME}/.local/bin/dcomp" ]; then
-	rm "${HOME}/.local/bin/dcomp"
+DCOMP_BIN_FILE="${HOME}/.local/bin/dcomp"
+if [ -f "${DCOMP_BIN_FILE}" ]; then
+	rm "${DCOMP_BIN_FILE}"
 fi
-ln -s "${DCOMP_DIR}/dcomp.sh" "${HOME}/.local/bin/dcomp"
+mkdir -p "$(dirname "${DCOMP_BIN_FILE}")"
+ln -s "${DCOMP_DIR}/dcomp.sh" "${DCOMP_BIN_FILE}"
+export PATH="$(dirname "${DCOMP_BIN_FILE}"):${PATH}"
 
 # CHECK IF THE INSTALLATION WAS SUCCESSFUL
 if ! command -v dcomp >/dev/null 2>&1; then
