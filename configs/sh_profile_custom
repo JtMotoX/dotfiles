@@ -42,8 +42,8 @@ vsc() {
 	relpath="$1"
 	if [ "${relpath}" = "" ]; then relpath="$(pwd)"; fi
 	if [ -f "${relpath}" ]; then relpath="$(dirname "${relpath}")"; fi
-	if [ ! -d "${relpath}" ]; then echo "Path not found: '${relpath}'"; return 1; fi
-	abspath="$(cd ${relpath} && pwd)"
+	abspath="$(cd ${relpath} 2>/dev/null && pwd)"
+	if [ "${abspath}" = "" ]; then echo "Path not found: '${relpath}'"; return 1; fi
 	if hostname -s | grep '^vmwjjj' >/dev/null 2>&1; then
 		tunnel_url="https://vsc:4443/?folder="
 	elif systemctl --user status code-tunnel.service >/dev/null 2>&1; then
