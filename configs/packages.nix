@@ -33,6 +33,8 @@ in
     zoxide
     fzf
     fzf-zsh
+    # devbox
+    # direnv
     tmux
     util-linux # chsh
     ncurses # clear
