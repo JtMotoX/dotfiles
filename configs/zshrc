@@ -141,7 +141,11 @@ export PATH="$HOME/.local/bin:$PATH"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git docker docker-compose zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf kubectl)
+# plugins=(git docker docker-compose zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf kubectl direnv)
 # plugins=(git colored-man colorize pip python brew osx zsh-syntax-highlighting zsh-autosuggestions)
+
+# # SUPPRESS DIRENV EXPORT LOGS
+# export DIRENV_LOG_FORMAT=
 
 source $ZSH/oh-my-zsh.sh
 
