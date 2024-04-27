@@ -52,6 +52,7 @@ fi
 # Place this above the .oh-my-zsh.sh source to retain the omz cd completion
 # The omz completion lets you tab complete directories within the current directly by typing any part of the directory word
 #   But you will lose the ability to use zoxide+fzf word-tab interactive menu
+test -d "$HOME/.local/bin" && export PATH="$HOME/.local/bin:${PATH}"
 eval "$(zoxide init --cmd cd zsh)"
 
 # If you come from bash you might have to change your $PATH.
@@ -61,6 +62,11 @@ eval "$(zoxide init --cmd cd zsh)"
 export ZSH="${HOME}/.oh-my-zsh"
 
 # LOAD KUBECTX AND KUBENS COMPLETIONS
+# KUBECTX WILL BE INSTALLED WITH NIX, HOWEVER CAN BE INSTALLED MANUALLY WITH THE FOLLOWING:
+# # sudo git clone https://github.com/ahmetb/kubectx /usr/local/kubectx
+# # sudo ln -s /usr/local/kubectx/kubectx /usr/local/bin/kubectx
+# # sudo ln -s /usr/local/kubectx/kubens /usr/local/bin/kubens
+# # sudo ln -s /usr/local/kubectx/completion/*.zsh /usr/share/zsh/vendor-completions
 kubens_completion_dir="${ZSH}/custom/plugins/kubectx/completion"
 [ -d "${kubens_completion_dir}" ] && fpath+="${kubens_completion_dir}"
 
