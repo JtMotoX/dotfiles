@@ -167,6 +167,7 @@ if [ "$(uname)" = "Darwin" ]; then
     if ! xcode-select -p >/dev/null 2>&1; then
         xcode-select --install
     fi
+    ./scripts/brew-restore.sh
 fi
 # ./scripts/bourne-sh-install.sh
 install_package zsh
