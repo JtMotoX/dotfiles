@@ -9,4 +9,4 @@ brewfile="configs/brewfile"
 
 brewfile="$(cd "$(dirname "${brewfile}")" && pwd)/$(basename "${brewfile}")"
 
-brew bundle install --file="${brewfile}" --no-lock
+brew bundle install --file="${brewfile}" --no-lock | grep -v '^Using '
