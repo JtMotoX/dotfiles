@@ -148,7 +148,10 @@ install_package curl
 load_nix_env
 if ! nix-shell -p --run true >/dev/null 2>&1; then
     ./scripts/nix-uninstall.sh
-    for key in $(env | grep '^NIX_' | awk -F= '{print $1}'); do unset $key; done
+    # for nix_key in $(env | grep '^NIX_' | awk -F= '{print $1}'); do
+    #     echo "Unsetting '${nix_key}' . . ."
+    #     unset ${nix_key}
+    # done
     ./scripts/nix-install.sh
     reload_needed="true"
 fi
