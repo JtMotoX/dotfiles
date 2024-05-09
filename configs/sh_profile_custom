@@ -340,7 +340,7 @@ test -e "${HOME}/.iterm2_shell_integration.bash" && { source "${HOME}/.iterm2_sh
 kube_reload() {
 	trap 'trap - ERR; return' ERR
 	if ! command -v kubectl >/dev/null 2>&1; then echo "kubectl is not installed"; return 1; fi
-	if ! command -v kubectx >/dev/null 2>&1 || ! command -v kubens >/dev/null 2>&1; then echo "kubectx/kubens is not installed"; return 1; fi
+	# if ! command -v kubectx >/dev/null 2>&1 || ! command -v kubens >/dev/null 2>&1; then echo "kubectx/kubens is not installed"; return 1; fi
 	silent="false"
 	while [ $# -gt 0 ]; do
 		case "$1" in

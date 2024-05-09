@@ -24,7 +24,8 @@ in
     git-crypt
     kind
     kubectl_pin.kubectl
-    kubectx
+    # kubectx
+    kubeswitch
     yq-go
     jq
     velero_pin.velero
