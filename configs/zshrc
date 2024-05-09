@@ -67,8 +67,8 @@ export ZSH="${HOME}/.oh-my-zsh"
 # # sudo ln -s /usr/local/kubectx/kubectx /usr/local/bin/kubectx
 # # sudo ln -s /usr/local/kubectx/kubens /usr/local/bin/kubens
 # # sudo ln -s /usr/local/kubectx/completion/*.zsh /usr/share/zsh/vendor-completions
-kubens_completion_dir="${ZSH}/custom/plugins/kubectx/completion"
-[ -d "${kubens_completion_dir}" ] && fpath+="${kubens_completion_dir}"
+# kubens_completion_dir="${ZSH}/custom/plugins/kubectx/completion"
+# [ -d "${kubens_completion_dir}" ] && fpath+="${kubens_completion_dir}"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -192,6 +192,10 @@ unsetopt nomatch
 
 # CREATE th FOR ZSH TMUX HELP
 th() { cat ~/.oh-my-zsh/plugins/tmux/README.md | grep --color=never -E '^\|\s*`[a-z]+`\s*\|'; }
+
+# LOAD KUBESWITCHER
+source <(switcher init zsh)
+source <(switch completion zsh)
 
 # LOAD CUSTOM NON-ZSH-SPECIFIC PROFILE
 test -f ~/.sh_profile_custom && source ~/.sh_profile_custom

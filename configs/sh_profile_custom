@@ -503,9 +503,18 @@ unalias kl 2>/dev/null
 if type kubectl &>/dev/null; then
 	#alias kubectl="kubectl --insecure-skip-tls-verify"
 	alias k="kubectl --insecure-skip-tls-verify"
-	if type kubectx &>/dev/null; then
-		alias kx="kubectx"
-		alias kn="kubens"
+	# if type kubectx &>/dev/null; then
+	# 	alias kx="kubectx"
+	# 	alias kn="kubens"
+	# fi
+
+	if type switcher &>/dev/null; then
+		alias kx="touch ~/.kube/.switched && switch set-context"
+		alias kn="switch namespace"
+		alias kxu="rm -f ~/.kube/.switched && switch unset-context"
+		if [ -f ~/.kube/.switched ]; then
+			switch set-last-context >/dev/null 2>&1 || true
+		fi
 	fi
 
 	# TEST ALL KUBECONFIGS
@@ -627,7 +636,9 @@ if type kubectl &>/dev/null; then
 		_kf() { _arguments "1: :($(kubectl get deployment,sts --no-headers | awk '{print $1}' | sed 's/\.apps//'))"; }
 		compdef _kf kf
 	fi
+fi
 
+if type kubectl &>/dev/null; then
 	# FUNCTION TO SEARCH ALL CLUSTERS FOR NAMESPACE
 	kxn() {
 		SEARCH_NS="$1"
@@ -655,15 +666,14 @@ if type kubectl &>/dev/null; then
 			echo "Multiple namespaces found. Unable to set context."
 			return 1
 		elif [ ${NS_RESULTS_COMBINED_COUNT} -eq 1 ]; then
-			kubectx "${CURRENT_CONTEXT}"
-			kubens "${NS_RESULTS_COMBINED}"
+			kx "${CURRENT_CONTEXT}"
+			kn "${NS_RESULTS_COMBINED}"
 			return
 		else
 			echo "There was an error"
 			return 1
 		fi
 	}
-
 fi
 
 if type velero &>/dev/null; then
