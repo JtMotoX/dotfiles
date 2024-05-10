@@ -193,10 +193,6 @@ unsetopt nomatch
 # CREATE th FOR ZSH TMUX HELP
 th() { cat ~/.oh-my-zsh/plugins/tmux/README.md | grep --color=never -E '^\|\s*`[a-z]+`\s*\|'; }
 
-# LOAD KUBESWITCHER
-source <(switcher init zsh)
-source <(switch completion zsh)
-
 # LOAD CUSTOM NON-ZSH-SPECIFIC PROFILE
 test -f ~/.sh_profile_custom && source ~/.sh_profile_custom
 
