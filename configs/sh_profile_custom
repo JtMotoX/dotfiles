@@ -165,6 +165,15 @@ yq_disabled() {
 	fi
 }
 
+# REPLACEMENT WATCH COMMAND THAT SOURCES YOUR ENVIRONMENT
+watchenv() {
+    args=("$@")
+    num_args=${#args[@]}
+    last_argument=${args[$((num_args))]}
+    remaining_arguments=${args[@]:0:$((num_args-1))}
+	command watch $remaining_arguments "NO_ZSH_CLEAR=true NO_ZSH_TITLE=true zsh -i -c '$last_argument'"
+}
+
 # FUNCTION TO PARSE ANSIBLE LOG TASKS
 ansible_task_parse() {
 	if [[ "$1" == "" ]]; then echo "You need to pass a file to parse"; return 1; fi

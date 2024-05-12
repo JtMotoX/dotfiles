@@ -214,7 +214,7 @@ setopt rm_star_silent
 # SET THE TERMINAL TITLE TO LAST COMMAND
 DISABLE_AUTO_TITLE="true"
 preexec () { print -n "\033]0;$(hostname -s) : ${1:0:150}\007"; }
-preexec
+[ "${NO_ZSH_TITLE}" != "true" ] && preexec
 
 # FIX ZSH-COMPLETIONS FOR APPLE SILICON
 if [[ $(uname -m) == 'arm64' ]] && type brew &>/dev/null; then
