@@ -26,6 +26,7 @@ in
     kubectl_pin.kubectl
     # kubectx
     kubeswitch
+    kubernetes-helm
     yq-go
     jq
     velero_pin.velero
