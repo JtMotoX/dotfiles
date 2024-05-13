@@ -602,7 +602,7 @@ if type kubectl &>/dev/null; then
 	# KUBECTL POD LOGS
 	kl() {
 		set -x
-		kubectl logs --all-containers=true --ignore-errors=true -l app.kubernetes.io/name=$@;
+		kubectl logs --all-containers=true --ignore-errors=true --tail -1 -l app.kubernetes.io/name=$@;
 		{ set +x; } 2>/dev/null
 	}
 	if type compdef &>/dev/null; then
@@ -623,7 +623,7 @@ if type kubectl &>/dev/null; then
 			if ! printf "%s" "${val}" | awk '/[^\x00-\x7F]/ { exit 1 }'; then
 				val="<<<non-ascii-data>>>"
 			fi
-			secret_decoded="$(printf '%s' "${secret_decoded}" | jq -n --arg key "${key}" --arg val "${val}" '. += {($key): $val}')"
+			secret_decoded="$(printf '%s' "${secret_decoded}" | jq --arg key "${key}" --arg val "${val}" '. += {($key): $val}')"
 		done
 		kubectl get secret ${secret_name} -o json | jq --argjson secret_decoded "${secret_decoded}" '. | .["data"] = $secret_decoded' | jq 'del(.metadata.annotations["kubectl.kubernetes.io/last-applied-configuration"])'
 	}
