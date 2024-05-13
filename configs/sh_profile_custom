@@ -632,6 +632,11 @@ if type kubectl &>/dev/null; then
 		compdef _ks ks
 	fi
 
+	# DISPLAYS ALL K8S RESOURCES
+	kr() {
+		kubectl get $(kubectl api-resources --namespaced=true --output=name | grep -v -E '^events(\.|$)' | tr '\n' ',' | sed 's/,$/\n/') 2>&1 | grep -v 'MethodNotAllowed'
+	}
+
 	# KUBECTL PORT-FOWARD FUNCTION
 	kf() {
 		[ $# -eq 0 ] && { echo "You need to specify the service name"; return 1; }
