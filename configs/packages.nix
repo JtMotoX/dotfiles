@@ -16,6 +16,8 @@ let
   velero_pin = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/b3a285628a6928f62cdf4d09f4e656f7ecbbcafb.tar.gz") {};
   # inludes kubectl 1.25.4
   kubectl_pin = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/b3a285628a6928f62cdf4d09f4e656f7ecbbcafb.tar.gz") {};
+  # unstable
+  unstable = import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") {};
 in
 
 {
@@ -25,7 +27,7 @@ in
     kind
     kubectl_pin.kubectl
     # kubectx
-    kubeswitch
+    unstable.kubeswitch
     kubernetes-helm
     yq-go
     jq
