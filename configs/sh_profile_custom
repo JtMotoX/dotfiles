@@ -604,7 +604,7 @@ if type kubectl &>/dev/null; then
 	# KUBECTL POD LOGS
 	kl() {
 		set -x
-		kubectl logs --all-containers=true --ignore-errors=true --tail -1 -l app.kubernetes.io/name=$@;
+		kubectl logs --all-containers=true --ignore-errors=true --tail -1 -f -l app.kubernetes.io/name=$@;
 		{ set +x; } 2>/dev/null
 	}
 	if type compdef &>/dev/null; then
