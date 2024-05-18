@@ -39,6 +39,13 @@ elif [ "$(uname)" = "Linux" ]; then
 	alias glscan='docker run --rm -it -v "/tmp:/tmp" -v "$(pwd):$(pwd)" -w "$(pwd)" -u $(id -u):$(id -g) -e no_git -e secrets_in_logs docker-ngdc.repo.east1.ncloud.netapp.com/devexp-engg/gitleaks-repo-scanner:latest'
 fi
 
+# FUNCTION TO UPDATE DOTFILES AND APPLY CHANGES
+dotu() {
+	if [ ! -d "${dotdir}" ]; then echo "Unable to determine dotfiles directory"; return 1; fi
+	git -C "${dotdir}" pull
+	"${dotdir}/setup.sh"
+}
+
 # FUNCTION TO GIVE VSC URL
 vsc() {
 	relpath="$1"
