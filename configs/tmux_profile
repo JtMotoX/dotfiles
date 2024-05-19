@@ -25,8 +25,10 @@ if command -v tmux >/dev/null 2>&1; then
 	if ! is_tmux; then
 		# if echo "$(hostname | sed 's/\..*$//')" | grep '^vmw' >/dev/null; then
 			if ! echo "${PATH}" | grep -E '(\.vscode-cli)|(\.vscode-insiders/cli)|(\.vscode/cli)' >/dev/null 2>&1; then
-				ta
-				exit $?
+				if [ "${TERM_PROGRAM}" != "WarpTerminal" ]; then
+					ta
+					exit $?
+				fi
 			fi
 		# fi
 	fi
