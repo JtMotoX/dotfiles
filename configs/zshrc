@@ -217,7 +217,8 @@ setopt rm_star_silent
 
 # SET THE TERMINAL TITLE TO LAST COMMAND
 DISABLE_AUTO_TITLE="true"
-preexec () { print -n "\033]0;$(hostname -s) : ${1:0:150}\007"; }
+HOSTNAME_SHORT="$(hostname -s)"
+preexec () { print -n "\033]0;${HOSTNAME_SHORT} : ${1:0:150}\007"; }
 [ "${NO_ZSH_TITLE}" != "true" ] && preexec
 
 # FIX ZSH-COMPLETIONS FOR APPLE SILICON
