@@ -24,7 +24,7 @@ alias lzd='docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock lazy
 
 alias dfimage="docker run --rm -i -v /var/run/docker.sock:/var/run/docker.sock alpine/dfimage"
 
-alias trivy="docker run --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/aquasecurity/trivy:latest image --scanners vuln --ignore-unfixed"
+alias trivy="docker run --rm -t -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/aquasecurity/trivy:latest image --scanners vuln --ignore-unfixed"
 
 alias whitespace="sed 's/ /·/g;s/\t/￫/g;s/\r/§/g;s/$/¶/g'"
 
