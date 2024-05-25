@@ -496,8 +496,8 @@ fi
 export PATH="$HOME/.local/bin:$PATH"
 
 # LOAD KUBESWITCHER
-source <(switcher init zsh)
-source <(switch completion zsh)
+type switcher &>/dev/null && source <(switcher init zsh)
+type switch &>/dev/null && source <(switch completion zsh)
 
 # # FUNCTION TO ALLOW yq WITHOUT EXTRA ARGS
 # if type yq &>/dev/null; then
