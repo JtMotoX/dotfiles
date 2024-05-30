@@ -706,6 +706,11 @@ if type velero &>/dev/null; then
 	alias v="velero"
 fi
 
+if type nix &>/dev/null; then
+	alias nixu="nix-channel --update && nix-env -u '*'"
+	alias nix-autoremove="nix-collect-garbage -d"
+fi
+
 if [ -f ~/.ansible.cfg.sh ]; then source ~/.ansible.cfg.sh; fi
 
 if type ansible-playbook &>/dev/null; then
