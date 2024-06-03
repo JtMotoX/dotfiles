@@ -37,7 +37,7 @@ unset glibc_locales_install_path
 # CHECK FOR DOTFILES UPDATES ONCE A DAY
 zshrc_file="$(ls -l "$HOME/.zshrc" | awk -F" -> " '{print $2}')"
 if echo "${zshrc_file}" | grep -E '\/configs\/zshrc' >/dev/null 2>&1; then
-    export dotdir="$(cd "$(dirname "${zshrc_file}")/../" && pwd)"
+    export dotdir="$(cd $HOME && cd "$(dirname "${zshrc_file}")/../" && pwd)"
     ("${dotdir}/scripts/update-dotfiles.sh" &)
 fi
 
