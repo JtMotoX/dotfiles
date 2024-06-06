@@ -32,6 +32,8 @@ alias bfg='docker run --rm -it -v "$(pwd):/work" -u $(id -u ${USER}):$(id -g ${U
 
 alias yqc='docker run --rm -i backplane/pygmentize -l yaml'
 
+alias clear='printf "\033c"' # workaround that prevents the original clear command from clearing the tmux history
+
 # GITLEAKS REPO SCANNER
 if [ "$(uname)" = "Darwin" ]; then
     alias glscan='docker run --rm -it -v "$HOME/Downloads:$HOME/Downloads" -v "$(pwd):$(pwd)" -w "$(pwd)" -u $(id -u):$(id -g) -e repo_scan_log_dir="$HOME/Downloads" -e no_git -e secrets_in_logs docker-ngdc.repo.east1.ncloud.netapp.com/devexp-engg/gitleaks-repo-scanner:latest'
