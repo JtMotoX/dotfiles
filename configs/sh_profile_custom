@@ -805,6 +805,9 @@ test -f ~/.sh_profile_local && { source ~/.sh_profile_local; } || true
 # ENABLE COLORS
 TERM=xterm-256color
 
+# REMOVE DUPLICATE PATHS
+export PATH="$(perl -e 'print join(":", grep { not $seen{$_}++ } split(/:/, $ENV{PATH}))')"
+
 # sleep 0.1
 # clear
 # tpu
