@@ -42,7 +42,7 @@ brew "node"
 brew "openjdk"
 brew "p7zip"
 brew "pcre"
-brew "php", restart_service: false
+brew "php"
 brew "pyenv"
 brew "pyenv-virtualenv"
 brew "pygments"
