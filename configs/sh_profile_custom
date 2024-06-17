@@ -357,33 +357,51 @@ test -e "${HOME}/.iterm2_shell_integration.bash" && { source "${HOME}/.iterm2_sh
 
 # FUNCTION TO UPDATE ALL PACKAGES
 update() {
+	if [ "$(whoami)" = "root" ]; then
+		echo "WARNING! You are running as root. This is not recommended."
+		while true; do
+			printf "Do you want to continue (y/n)? "
+			read yn
+			case $yn in
+				[Yy]* ) break;;
+				[Nn]* ) return 1;;
+				* ) echo "Please answer yes or no."; continue;;
+			esac
+		done
+	else
+		if ! sudo whoami >/dev/null 2>&1; then
+			echo "You must have sudo privileges to run this command"
+			return 1
+		fi
+		SUDO="sudo"
+	fi
 	if type apt-get &>/dev/null; then
 		echo "Updating apt-get..."
-		sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get autoremove -y
+		$SUDO apt-get update && $SUDO apt-get upgrade -y && $SUDO apt-get autoremove -y
 	fi
 	if type pacman &>/dev/null; then
 		echo "Updating pacman..."
-		sudo pacman -Syu
+		$SUDO pacman -Syu
 	fi
 	if type dnf &>/dev/null; then
 		echo "Updating dnf..."
-		sudo dnf update -y
+		$SUDO dnf update -y
 	fi
 	if type yum &>/dev/null; then
 		echo "Updating yum..."
-		sudo yum update -y
+		$SUDO yum update -y
 	fi
 	if type zypper &>/dev/null; then
 		echo "Updating zypper..."
-		sudo zypper update -y
+		$SUDO zypper update -y
 	fi
 	if type apk &>/dev/null; then
 		echo "Updating apk..."
-		sudo apk update && sudo apk upgrade
+		$SUDO apk update && $SUDO apk upgrade
 	fi
 	if type pkg &>/dev/null; then
 		echo "Updating pkg..."
-		sudo pkg update && sudo pkg upgrade
+		$SUDO pkg update && $SUDO pkg upgrade
 	fi
 	if type nix-channel &>/dev/null; then
 		echo "Updating nix..."
@@ -395,7 +413,7 @@ update() {
 	fi
 	if type snap &>/dev/null; then
 		echo "Updating snap..."
-		sudo snap refresh
+		$SUDO snap refresh
 	fi
 	if type brew &>/dev/null; then
 		echo "Updating brew..."
@@ -403,7 +421,7 @@ update() {
 	fi
 	if type port &>/dev/null; then
 		echo "Updating port..."
-		sudo port selfupdate && sudo port upgrade outdated
+		$SUDO port selfupdate && $SUDO port upgrade outdated
 	fi
 	echo "Updated!"
 }
