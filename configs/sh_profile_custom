@@ -355,6 +355,59 @@ pipeline() {
 
 test -e "${HOME}/.iterm2_shell_integration.bash" && { source "${HOME}/.iterm2_shell_integration.bash"; } || true
 
+# FUNCTION TO UPDATE ALL PACKAGES
+update() {
+	if type apt-get &>/dev/null; then
+		echo "Updating apt-get..."
+		sudo apt-get update && sudo apt-get upgrade -y && sudo apt-get autoremove -y
+	fi
+	if type pacman &>/dev/null; then
+		echo "Updating pacman..."
+		sudo pacman -Syu
+	fi
+	if type dnf &>/dev/null; then
+		echo "Updating dnf..."
+		sudo dnf update -y
+	fi
+	if type yum &>/dev/null; then
+		echo "Updating yum..."
+		sudo yum update -y
+	fi
+	if type zypper &>/dev/null; then
+		echo "Updating zypper..."
+		sudo zypper update -y
+	fi
+	if type apk &>/dev/null; then
+		echo "Updating apk..."
+		sudo apk update && sudo apk upgrade
+	fi
+	if type pkg &>/dev/null; then
+		echo "Updating pkg..."
+		sudo pkg update && sudo pkg upgrade
+	fi
+	if type nix-channel &>/dev/null; then
+		echo "Updating nix..."
+		nix-channel --update && nix-env -u
+	fi
+	if type flatpak &>/dev/null; then
+		echo "Updating flatpak..."
+		flatpak update
+	fi
+	if type snap &>/dev/null; then
+		echo "Updating snap..."
+		sudo snap refresh
+	fi
+	if type brew &>/dev/null; then
+		echo "Updating brew..."
+		brew update && brew upgrade
+	fi
+	if type port &>/dev/null; then
+		echo "Updating port..."
+		sudo port selfupdate && sudo port upgrade outdated
+	fi
+	echo "Updated!"
+}
+
 # ADDS CUSTOM KUBECONFIG FILES TO CONTEXT
 # TO SWITCH CONTEXTS AND NAMESPACES USE https://github.com/ahmetb/kubectx
 kube_reload() {
