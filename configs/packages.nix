@@ -32,7 +32,6 @@ in
     yq-go
     jq
     velero_pin.velero
-    docker
     docker-compose
     zoxide
     fzf
