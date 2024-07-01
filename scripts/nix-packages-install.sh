@@ -10,8 +10,8 @@ echo "Installing nix packages . . ."
 nix-env -f "../configs/packages.nix" -iA environment.systemPackages
 echo "Nix packages installed."
 
-if [ "$(uname)" = "Linux" ]; then
-	echo "Installing linux packages . . ."
-	nix-env -f "../configs/packages-linux.nix" -iA environment.systemPackages
-	echo "Linux packages installed."
-fi
+# if [ "$(uname)" = "Linux" ]; then
+# 	echo "Installing linux packages . . ."
+# 	nix-env -f "../configs/packages-linux.nix" -iA environment.systemPackages
+# 	echo "Linux packages installed."
+# fi

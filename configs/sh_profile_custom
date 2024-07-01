@@ -16,7 +16,7 @@ alias csv="sed 's/,/ ,/g' | column -t -s,"
 
 alias reset="reset && printf '\033[2J\033[3J\033[1;1H'"
 
-export LC_CTYPE="en_US.UTF-8"
+# export LC_CTYPE="en_US.UTF-8"
 # IF YOU GET A LOCALE UNSUPPORTED ERROR
 # ENABLE MISSING LOCALES: sudo vim /etc/locale.gen
 # THEN REGENERATE: sudo locale-gen
