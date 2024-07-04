@@ -48,6 +48,31 @@ fi
 urlencode() { if test ! -t 0; then URL_STRING="$(cat)"; else URL_STRING="$1"; fi; perl -MURI::Escape -e 'print uri_escape($ARGV[0]);' "${URL_STRING}"; }
 urldecode() { if test ! -t 0; then URL_STRING="$(cat)"; else URL_STRING="$1"; fi; perl -MURI::Escape -e 'print uri_unescape($ARGV[0]);' "${URL_STRING}"; }
 
+# FUNCTION TO DECODE JWT TOKEN
+jwtdecode() {
+	if test ! -t 0; then JWT_STRING="$(cat)"; else JWT_STRING="$1"; fi
+	JWT_DOT_COUNT="$(echo "${JWT_STRING}" | grep -o "\." | wc -l)"
+	if [ "${JWT_DOT_COUNT}" -eq 2 ]; then
+		HEADER="$(echo "${JWT_STRING}" | cut -d "." -f 1 | base64 -d | jq)"
+		PAYLOAD="$(echo "${JWT_STRING}" | cut -d "." -f 2)"
+		SIGNATURE="$(echo "${JWT_STRING}" | cut -d "." -f 3)"
+	elif [ "${JWT_DOT_COUNT}" -eq 0 ]; then
+		HEADER="na"
+		PAYLOAD=$(echo "${JWT_STRING}")
+		SIGNATURE="na"
+	else
+		echo "Invalid JWT string"
+		return 1
+	fi
+	PAYLOAD="$(echo "${PAYLOAD}====" | fold -w 4 | sed '$ d' | tr -d '\n' | base64 -d -i)"
+	# echo "Header:"
+	# if [ "${HEADER}" != "na" ] && type jq >/dev/null; then echo "${HEADER}" | jq; else echo "${HEADER}"; fi
+	# echo "Payload:"
+	if type jq >/dev/null; then echo "${PAYLOAD}" | jq; else echo "${PAYLOAD}"; fi
+	# echo "Signature:"
+	# echo "${SIGNATURE}"
+}
+
 # FUNCTION TO UPDATE DOTFILES AND APPLY CHANGES
 dotu() {
 	if [ ! -d "${dotdir}" ]; then echo "Unable to determine dotfiles directory"; return 1; fi
