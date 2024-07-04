@@ -44,6 +44,10 @@ elif [ "$(uname)" = "Linux" ]; then
 	alias glscan='docker run --rm -it -v "/tmp:/tmp" -v "$(pwd):$(pwd)" -w "$(pwd)" -u $(id -u):$(id -g) -e no_git -e secrets_in_logs docker-ngdc.repo.east1.ncloud.netapp.com/devexp-engg/gitleaks-repo-scanner:latest'
 fi
 
+# FUNCTIONS TO URL ENCODE AND DECODE
+urlencode() { if test ! -t 0; then URL_STRING="$(cat)"; else URL_STRING="$1"; fi; perl -MURI::Escape -e 'print uri_escape($ARGV[0]);' "${URL_STRING}"; }
+urldecode() { if test ! -t 0; then URL_STRING="$(cat)"; else URL_STRING="$1"; fi; perl -MURI::Escape -e 'print uri_unescape($ARGV[0]);' "${URL_STRING}"; }
+
 # FUNCTION TO UPDATE DOTFILES AND APPLY CHANGES
 dotu() {
 	if [ ! -d "${dotdir}" ]; then echo "Unable to determine dotfiles directory"; return 1; fi
