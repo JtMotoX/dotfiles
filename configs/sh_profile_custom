@@ -16,7 +16,10 @@ alias csv="sed 's/,/ ,/g' | column -t -s,"
 
 alias reset="reset && printf '\033[2J\033[3J\033[1;1H'"
 
-export LC_CTYPE="en_US.UTF-8"
+# export LC_CTYPE="en_US.UTF-8"
+# IF YOU GET A LOCALE UNSUPPORTED ERROR
+# ENABLE MISSING LOCALES: sudo vim /etc/locale.gen
+# THEN REGENERATE: sudo locale-gen
 
 alias dive='docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive:latest'
 
@@ -40,6 +43,35 @@ if [ "$(uname)" = "Darwin" ]; then
 elif [ "$(uname)" = "Linux" ]; then
 	alias glscan='docker run --rm -it -v "/tmp:/tmp" -v "$(pwd):$(pwd)" -w "$(pwd)" -u $(id -u):$(id -g) -e no_git -e secrets_in_logs docker-ngdc.repo.east1.ncloud.netapp.com/devexp-engg/gitleaks-repo-scanner:latest'
 fi
+
+# FUNCTIONS TO URL ENCODE AND DECODE
+urlencode() { if test ! -t 0; then URL_STRING="$(cat)"; else URL_STRING="$1"; fi; perl -MURI::Escape -e 'print uri_escape($ARGV[0]);' "${URL_STRING}"; }
+urldecode() { if test ! -t 0; then URL_STRING="$(cat)"; else URL_STRING="$1"; fi; perl -MURI::Escape -e 'print uri_unescape($ARGV[0]);' "${URL_STRING}"; }
+
+# FUNCTION TO DECODE JWT TOKEN
+jwtdecode() {
+	if test ! -t 0; then JWT_STRING="$(cat)"; else JWT_STRING="$1"; fi
+	JWT_DOT_COUNT="$(echo "${JWT_STRING}" | grep -o "\." | wc -l)"
+	if [ "${JWT_DOT_COUNT}" -eq 2 ]; then
+		HEADER="$(echo "${JWT_STRING}" | cut -d "." -f 1 | base64 -d | jq)"
+		PAYLOAD="$(echo "${JWT_STRING}" | cut -d "." -f 2)"
+		SIGNATURE="$(echo "${JWT_STRING}" | cut -d "." -f 3)"
+	elif [ "${JWT_DOT_COUNT}" -eq 0 ]; then
+		HEADER="na"
+		PAYLOAD=$(echo "${JWT_STRING}")
+		SIGNATURE="na"
+	else
+		echo "Invalid JWT string"
+		return 1
+	fi
+	PAYLOAD="$(echo "${PAYLOAD}====" | fold -w 4 | sed '$ d' | tr -d '\n' | base64 -d -i)"
+	# echo "Header:"
+	# if [ "${HEADER}" != "na" ] && type jq >/dev/null; then echo "${HEADER}" | jq; else echo "${HEADER}"; fi
+	# echo "Payload:"
+	if type jq >/dev/null; then echo "${PAYLOAD}" | jq; else echo "${PAYLOAD}"; fi
+	# echo "Signature:"
+	# echo "${SIGNATURE}"
+}
 
 # FUNCTION TO UPDATE DOTFILES AND APPLY CHANGES
 dotu() {
@@ -671,9 +703,9 @@ if type kubectl &>/dev/null; then
 	ke() {
 		[ $# -eq 0 ] && { echo "You need to specify the service name"; return 1; }
 		SERVICE_NAME=$1; shift
-		[ $# -eq 0 ] && { ARGS=('command -v bash >/dev/null 2>&1 && { bash -l; exit $?; } || command -v ash >/dev/null 2>&1 && { ash -l; exit $?; } || sh -l'); } || { ARGS=("$@"); }
-		set -x
-		kubectl exec -it $(kubectl get pods -l app.kubernetes.io/name=${SERVICE_NAME} -o jsonpath='{.items[0].metadata.name}') -- sh -c ${ARGS[@]}
+		[ $# -eq 0 ] && { ARGS=('sh' '-c' 'command -v bash >/dev/null 2>&1 && { bash -l; exit $?; } || command -v ash >/dev/null 2>&1 && { ash -l; exit $?; } || sh -l'); } || { ARGS=("$@"); }
+		# set -x
+		kubectl exec -it $(kubectl get pods -l app.kubernetes.io/name=${SERVICE_NAME} -o jsonpath='{.items[0].metadata.name}') -- ${ARGS[@]}
 		{ set +x; } 2>/dev/null
 	}
 	if type compdef &>/dev/null; then
