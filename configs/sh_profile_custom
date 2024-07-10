@@ -840,6 +840,8 @@ if test -d ~/.krew/bin; then
 	alias krew="kubectl krew"
 fi
 
+alias km="kubectl mc"
+
 test -f ~/.sh_profile_local && { source ~/.sh_profile_local; } || true
 
 # ENABLE COLORS
