@@ -834,6 +834,12 @@ export VSCODE_CLI_USE_FILE_KEYCHAIN=1
 # RANCHER DESKTOP
 test -d ~/.rd/bin && export PATH="$(cd ~ && pwd)/.rd/bin:$PATH"
 
+# KUBECTL KREW
+if test -d ~/.krew/bin; then
+	export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+	alias krew="kubectl krew"
+fi
+
 test -f ~/.sh_profile_local && { source ~/.sh_profile_local; } || true
 
 # ENABLE COLORS
