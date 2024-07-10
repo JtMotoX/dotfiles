@@ -140,6 +140,16 @@ reload_needed="false"
 # INSTALL PACKAGE REPOS
 ./scripts/repos-install.sh
 
+if [ "$(uname)" = "Darwin" ]; then
+    if ! eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null; then
+        ./scripts/brew-install.sh
+    fi
+    if ! xcode-select -p >/dev/null 2>&1; then
+        xcode-select --install
+    fi
+    ./scripts/brew-restore.sh
+fi
+
 # INSTALL NIX DEPENDENCIES
 install_package xz || install_package xz-utils
 install_package curl
@@ -165,13 +175,6 @@ if ! command -v git | grep 'nix' >/dev/null 2>&1; then
     exit 1
 fi
 
-if [ "$(uname)" = "Darwin" ]; then
-    ./scripts/brew-install.sh
-    if ! xcode-select -p >/dev/null 2>&1; then
-        xcode-select --install
-    fi
-    ./scripts/brew-restore.sh
-fi
 # ./scripts/bourne-sh-install.sh
 install_package zsh
 ./scripts/zsh-install.sh
