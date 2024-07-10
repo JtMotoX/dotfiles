@@ -705,9 +705,17 @@ if type kubectl &>/dev/null; then
 	ke() {
 		[ $# -eq 0 ] && { echo "You need to specify the service name"; return 1; }
 		SERVICE_NAME=$1; shift
-		[ $# -eq 0 ] && { ARGS=('sh' '-c' 'command -v bash >/dev/null 2>&1 && { bash -l; exit $?; } || command -v ash >/dev/null 2>&1 && { ash -l; exit $?; } || sh -l'); } || { ARGS=("$@"); }
 		# set -x
-		kubectl exec -it $(kubectl get pods -l app.kubernetes.io/name=${SERVICE_NAME} -o jsonpath='{.items[0].metadata.name}') -- ${ARGS[@]}
+		pod_name="$(kubectl get pods -l app.kubernetes.io/name=${SERVICE_NAME} -o jsonpath='{.items[0].metadata.name}')"
+		if [ $# -eq 0 ]; then
+			if ! kubectl exec -it "${pod_name}" -- bash 2>/dev/null; then
+				if ! kubectl exec -it "${pod_name}" -- ash 2>/dev/null; then
+					kubectl exec -it "${pod_name}" -- sh
+				fi
+			fi
+		else
+			kubectl exec -it "${pod_name}" -- "$@"
+		fi
 		{ set +x; } 2>/dev/null
 	}
 	if type compdef &>/dev/null; then
