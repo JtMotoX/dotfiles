@@ -21,6 +21,8 @@ alias reset="reset && printf '\033[2J\033[3J\033[1;1H'"
 # ENABLE MISSING LOCALES: sudo vim /etc/locale.gen
 # THEN REGENERATE: sudo locale-gen
 
+alias d='docker'
+
 alias dive='docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive:latest'
 
 alias lzd='docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock lazyteam/lazydocker'
