@@ -73,7 +73,7 @@ if [ "$(uname)" = "Darwin" ]; then
     # REMOVE NIX VOLUME MOUNTPOINT CREATION CONFIG
     if grep -E '^nix$' /etc/synthetic.conf >/dev/null 2>&1; then
         echo "Removing 'nix' mountpoint creation config"
-        sudo sed -i '/^nix$/d' /etc/synthetic.conf
+        sudo sed -i -E '/^nix$/d' /etc/synthetic.conf
         changed="true"
     fi
 
