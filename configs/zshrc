@@ -226,6 +226,9 @@ if [[ $(uname -m) == 'arm64' ]] && type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
   FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
   autoload -Uz compinit
+  compaudit 2>/dev/null | while read -r d; do
+    chmod g-w "$d"
+  done
   compinit
 fi
 
