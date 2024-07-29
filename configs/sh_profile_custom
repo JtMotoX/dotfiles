@@ -784,38 +784,71 @@ if type kubectl &>/dev/null; then
 fi
 
 if type kubectl &>/dev/null; then
+	# # FUNCTION TO SEARCH ALL CLUSTERS FOR NAMESPACE
+	# kxn() {
+	# 	SEARCH_NS="$1"
+	# 	NS_RESULTS_COMBINED=""
+	# 	if [ "${SEARCH_NS}" = "" ]; then
+	# 		echo "You need to specify the namespace search filter"
+	# 		return 1
+	# 	fi
+	# 	find ~/.kube/custom-contexts -name "*.config" -type f | while read -r KUBECONFIG_FILE; do
+	# 		NS_RESULTS="$(KUBECONFIG="${KUBECONFIG_FILE}" kubectl get ns | awk '{print $1}' | grep ${SEARCH_NS})"
+	# 		if [ "${NS_RESULTS}" != "" ]; then
+	# 			CURRENT_CONTEXT="$(KUBECONFIG="${KUBECONFIG_FILE}" kubectl config current-context)"
+	# 			NS_RESULTS_COMBINED="$(echo "${NS_RESULTS_COMBINED}\n${NS_RESULTS}" | sed -e '/^$/d')"
+	# 			# CLUSTER_NAME="$(KUBECONFIG="${KUBECONFIG_FILE}" kubectl config view --minify -o jsonpath='{.clusters[].name}{"\n"}')"
+	# 			echo "${CURRENT_CONTEXT}"
+	# 			echo "${NS_RESULTS}" | sed -e 's/^/- /'
+	# 		fi
+	# 	done
+	# 	NS_RESULTS_COMBINED="$(echo "${NS_RESULTS_COMBINED}" | sed -e '/^$/d')"
+	# 	NS_RESULTS_COMBINED_COUNT="$(echo "${NS_RESULTS_COMBINED}" | sed -e '/^$/d' | wc -l)"
+	# 	if [ ${NS_RESULTS_COMBINED_COUNT} -eq 0 ]; then
+	# 		echo "Namespace not found in any clusters"
+	# 		return 1
+	# 	elif [ ${NS_RESULTS_COMBINED_COUNT} -gt 1 ]; then
+	# 		echo "Multiple namespaces found. Unable to set context."
+	# 		return 1
+	# 	elif [ ${NS_RESULTS_COMBINED_COUNT} -eq 1 ]; then
+	# 		kx "${CURRENT_CONTEXT}"
+	# 		kn "${NS_RESULTS_COMBINED}"
+	# 		return
+	# 	else
+	# 		echo "There was an error"
+	# 		return 1
+	# 	fi
+	# }
+
 	# FUNCTION TO SEARCH ALL CLUSTERS FOR NAMESPACE
 	kxn() {
 		SEARCH_NS="$1"
-		NS_RESULTS_COMBINED=""
 		if [ "${SEARCH_NS}" = "" ]; then
 			echo "You need to specify the namespace search filter"
 			return 1
 		fi
-		find ~/.kube/custom-contexts -name "*.config" -type f | while read -r KUBECONFIG_FILE; do
-			NS_RESULTS="$(KUBECONFIG="${KUBECONFIG_FILE}" kubectl get ns | awk '{print $1}' | grep ${SEARCH_NS})"
-			if [ "${NS_RESULTS}" != "" ]; then
-				CURRENT_CONTEXT="$(KUBECONFIG="${KUBECONFIG_FILE}" kubectl config current-context)"
-				NS_RESULTS_COMBINED="$(echo "${NS_RESULTS_COMBINED}\n${NS_RESULTS}" | sed -e '/^$/d')"
-				# CLUSTER_NAME="$(KUBECONFIG="${KUBECONFIG_FILE}" kubectl config view --minify -o jsonpath='{.clusters[].name}{"\n"}')"
-				echo "${CURRENT_CONTEXT}"
-				echo "${NS_RESULTS}" | sed -e 's/^/- /'
-			fi
-		done
-		NS_RESULTS_COMBINED="$(echo "${NS_RESULTS_COMBINED}" | sed -e '/^$/d')"
-		NS_RESULTS_COMBINED_COUNT="$(echo "${NS_RESULTS_COMBINED}" | sed -e '/^$/d' | wc -l)"
-		if [ ${NS_RESULTS_COMBINED_COUNT} -eq 0 ]; then
-			echo "Namespace not found in any clusters"
+		all_namespaces="$(km -o json -- get ns)"
+		# all_namespaces="$(cat /tmp/test.json)"
+		filtered_namespaces="$(printf '%s' "${all_namespaces}" | jq -r --arg regexp "${SEARCH_NS}" '[to_entries[] | select(any(.value.items[]; .metadata.name | test($regexp)))] | .[].value.items |= map(select(.metadata.name | test($regexp)))')"
+		num_namespaces="$(printf '%s' "${filtered_namespaces}" | jq -r '[.[].value.items[]] | length')"
+		if [ "${num_namespaces}" -eq 0 ]; then
+			echo "No namespaces found in any cluster matching '${SEARCH_NS}'"
 			return 1
-		elif [ ${NS_RESULTS_COMBINED_COUNT} -gt 1 ]; then
-			echo "Multiple namespaces found. Unable to set context."
+		fi
+		formatted_namespaces="$(printf '%s' "${filtered_namespaces}" | jq -r '.[] | .key, (.value.items[] | "- \(.metadata.name)")')"
+		printf '%s\n' "${formatted_namespaces}"
+		if [ "${num_namespaces}" -gt 1 ]; then
+			echo
+			echo "Found ${num_namespaces} namespaces. Unable to set context."
 			return 1
-		elif [ ${NS_RESULTS_COMBINED_COUNT} -eq 1 ]; then
-			kx "${CURRENT_CONTEXT}"
-			kn "${NS_RESULTS_COMBINED}"
+		elif [ "${num_namespaces}" -eq 1 ]; then
+			FOUND_CONTEXT="$(printf '%s' "${filtered_namespaces}" | jq -r '.[0].key')"
+			FOUND_NAMESPACE="$(printf '%s' "${filtered_namespaces}" | jq -r '.[0].value.items[0].metadata.name')"
+			kx "${FOUND_CONTEXT}"
+			kn "${FOUND_NAMESPACE}"
 			return
 		else
-			echo "There was an error"
+			echo "Unknown error"
 			return 1
 		fi
 	}
