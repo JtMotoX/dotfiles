@@ -636,6 +636,10 @@ if type kubectl &>/dev/null; then
 	# 	alias kn="kubens"
 	# fi
 
+	alias kge="kubectl get events -w"
+
+	alias kga="kubectl get \$(kubectl api-resources --namespaced=true --output=name | grep -v -E '^(events|rolebindings|externalmetrics)(\.|$)' | tr '\n' ',' | sed 's/,$/\n/') 2>&1 | grep -v 'MethodNotAllowed'"
+
 	ky () {
 		kubectl "$@" -o yaml | bat -l yaml --paging=never --style=plain
 	}
@@ -644,6 +648,7 @@ if type kubectl &>/dev/null; then
 		alias kx="touch ~/.kube/.switched && switch set-context"
 		alias kn="switch namespace"
 		alias kxu="rm -f ~/.kube/.switched && switch unset-context"
+		alias kxl="switch list-contexts"
 		if [ -f ~/.kube/.switched ]; then
 			switch set-last-context >/dev/null 2>&1 || true
 		fi
