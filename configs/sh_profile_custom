@@ -636,6 +636,10 @@ if type kubectl &>/dev/null; then
 	# 	alias kn="kubens"
 	# fi
 
+	ky () {
+		kubectl "$@" -o yaml | bat -l yaml --paging=never --style=plain
+	}
+
 	if type switcher &>/dev/null; then
 		alias kx="touch ~/.kube/.switched && switch set-context"
 		alias kn="switch namespace"

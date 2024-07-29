@@ -42,6 +42,7 @@ in
     util-linux # chsh
     ncurses # clear
     inetutils # hostname, ping, ifconfig, telnet, etc..
+    bat
     ncdu
     bash
     which
