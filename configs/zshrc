@@ -232,5 +232,10 @@ if [[ $(uname -m) == 'arm64' ]] && type brew &>/dev/null; then
   compinit
 fi
 
+# VELERO ZSH COMPLETION
+if [ $commands[velero] ]; then
+  source <(velero completion zsh)
+fi
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
