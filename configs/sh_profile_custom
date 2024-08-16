@@ -668,7 +668,7 @@ if type kubectl &>/dev/null; then
 			PROGRESS_LINE="--- ${CLUSTER_NAME} ---"
 			tput civis # HIDE CURSOR
 			printf "${BLUE}${PROGRESS_LINE} ⏳${NC}"
-			KUBECONFIG=$k kubectl get po -n default >/dev/null 2>"${ERROR_LOG_FILE}"
+			KUBECONFIG=$k kubectl get namespaces >/dev/null 2>"${ERROR_LOG_FILE}"
 			if [ $? != 0 ] || grep -q '[^[:space:]]' "${ERROR_LOG_FILE}"; then
 				KUBECONFIG_ERROR=true
 				printf "\r\033[K${RED}${PROGRESS_LINE} ❌${NC}\n"
@@ -697,7 +697,7 @@ if type kubectl &>/dev/null; then
 		CLUSTER_WEB_URL="$(echo "${CLUSTER_API_URL_FULL}" | sed 's|/k8s/clusters/|/dashboard/c/|')"
 		CLUSTER_PLAYBOOK_URL="$(echo "${CLUSTER_API_URL_FULL}" | sed -E 's/^https?:\/\///' | sed 's|/k8s/clusters/|/c/|')"
 		AMBASSADOR_ID="$(kubectl get host -n ambassador -o json 2>/dev/null | jq -r '.items[] | select(.metadata.name | startswith("aes-internal-host-") and endswith("-cloudone-netapp-com")) | select(.metadata.name != "aes-internal-host-cloudone-netapp-com") | .spec.hostname' | grep -o -E 'prd[0-9]+')"
-		KONG_ID="$(k get ingress -n kong-examples -o json | jq -r '.items[] | select(.spec.ingressClassName == "kong-internal") | .spec.rules[0].host' | grep -o -E 'gw[0-9]+')"
+		KONG_ID="$(k get ingress -n kong-examples -o json | jq -r '.items[] | select(.spec.ingressClassName == "kong-internal") | .spec.rules[0].host' | grep -o -E 'gw[0-9]+' | head -n1)"
 		NAMESPACE_CONTEXT="$(kubectl config view --minify --output 'jsonpath={..namespace}')"
 		(
 			printf "Cluster Name:~${CLUSTER_NAME}\n"
