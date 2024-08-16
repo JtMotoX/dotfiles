@@ -649,6 +649,7 @@ if type kubectl &>/dev/null; then
 		alias kn="switch namespace"
 		alias kxu="rm -f ~/.kube/.switched && switch unset-context"
 		alias kxl="switch list-contexts"
+		alias knl="kubectl get namespace --no-headers | awk '{print \$1}'"
 		if [ -f ~/.kube/.switched ]; then
 			switch set-last-context >/dev/null 2>&1 || true
 		fi
