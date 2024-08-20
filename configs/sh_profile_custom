@@ -96,6 +96,7 @@ vsc() {
 		tunnel_url="https://vscode.dev/tunnel/${tunnel_name}"
 	else
 		echo "Unable to determine tunnel url"
+		echo "Try running `systemctl daemon-reload` and try again"
 		return 1
 	fi
 	echo "${tunnel_url}${abspath}"
