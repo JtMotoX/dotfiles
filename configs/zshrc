@@ -150,7 +150,7 @@ export PATH="$HOME/.local/bin:$PATH"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git docker docker-compose zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf kubectl)
+plugins=(git docker docker-compose zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf kubectl gh)
 # plugins=(git docker docker-compose zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf kubectl direnv)
 # plugins=(git colored-man colorize pip python brew osx zsh-syntax-highlighting zsh-autosuggestions)
 
@@ -239,3 +239,8 @@ fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# GITHUB COPILOT COMMANDS
+if [ -f ~/.gh_profile.zsh ] && command -v gh >/dev/null 2>&1; then
+  source ~/.gh_profile.zsh
+fi
