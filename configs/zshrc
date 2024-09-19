@@ -241,6 +241,6 @@ fi
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # GITHUB COPILOT COMMANDS
-if [ -f ~/.gh_profile.zsh ] && command -v gh >/dev/null 2>&1; then
-  source ~/.gh_profile.zsh
+if command -v gh >/dev/null 2>&1; then
+  eval "$(gh copilot alias -- zsh)"
 fi
