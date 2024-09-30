@@ -10,28 +10,6 @@
 
 ################################
 
-# # START NIX-SHELL ON TERMINAL STARTUP
-# if [ -e ~/.nix-profile/etc/profile.d/nix.sh ]; then . ~/.nix-profile/etc/profile.d/nix.sh; fi
-# if type nix-shell >/dev/null 2>&1 && [ -f ~/default.nix ] && [ "${NIX_STORE}" = "" ]; then
-#   export SHELL_REAL="${SHELL}" # PREVENT TMUX FROM LOADING NIX-SHELL BASH
-#   echo "Starting nix-shell . . ."
-#   nix-shell --run $SHELL
-#   exit $?
-# fi
-
-# LOAD NIX ENVIRONMENT
-if [ -f '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-    . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-elif [ -f ~/.nix-profile/etc/profile.d/nix.sh ]; then
-    . ~/.nix-profile/etc/profile.d/nix.sh
-fi
-# FIX NIX LOCALE ERRORS - requires pkgs.glibcLocales
-glibc_locales_install_path="$(nix-env --installed --no-name --out-path --query glibc-locales 2>/dev/null)"
-if [ "${glibc_locales_install_path}" != '' ]; then
-    export LOCALE_ARCHIVE="${glibc_locales_install_path}/lib/locale/locale-archive"
-fi
-unset glibc_locales_install_path
-
 [ "${NO_ZSH_CLEAR}" != "true" ] && clear
 
 # CHECK FOR DOTFILES UPDATES ONCE A DAY
@@ -51,6 +29,12 @@ test -f ~/.tmux_profile && source ~/.tmux_profile
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
+
+# LOAD BREW ENVIRONMENT
+if [ "${BREW_SHELL_ENV}" = "" ]; then BREW_SHELL_ENV="$(/opt/homebrew/bin/brew shellenv 2>/dev/null || true)"; fi
+if [ "${BREW_SHELL_ENV}" = "" ]; then BREW_SHELL_ENV="$(/home/linuxbrew/.linuxbrew/bin/brew shellenv 2>/dev/null || true)"; fi
+if [ "${BREW_SHELL_ENV}" != "" ]; then eval "${BREW_SHELL_ENV}"; fi
+unset BREW_SHELL_ENV
 
 # ZOXIDE REPLACE CD COMMAND
 # Place this above the .oh-my-zsh.sh source to retain the omz cd completion
@@ -150,7 +134,7 @@ export PATH="$HOME/.local/bin:$PATH"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git docker docker-compose zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf kubectl gh)
+plugins=(git docker docker-compose zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf kubectl gh brew)
 # plugins=(git docker docker-compose zsh-syntax-highlighting zsh-autosuggestions zsh-completions fzf kubectl direnv)
 # plugins=(git colored-man colorize pip python brew osx zsh-syntax-highlighting zsh-autosuggestions)
 

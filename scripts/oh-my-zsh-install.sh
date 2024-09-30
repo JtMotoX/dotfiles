@@ -29,11 +29,13 @@ if [ "${zsh_site_functions_dir}" != "" ]; then
 fi
 
 # INSTALL OR UPDATE OH-MY-ZSH
-if [ -d "${ZSH}" ]; then
+if [ -d "${ZSH}/.git" ]; then
 	echo "Updating oh-my-zsh"
 	git -C "${ZSH}" pull
 else
 	echo "Installing oh-my-zsh"
+	rm -rf "${ZSH}/custom" 2>/dev/null || true
+	rmdir "${ZSH}" 2>/dev/null || true
 	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
 fi
 
@@ -46,6 +48,7 @@ done
 
 # FUNCTION TO INSTALL OR UPDATE OH-MY-ZSH CUSTOM PLUGINS AND THEMES
 install_omz_custom() {
+	mkdir -p "${ZSH}/custom/$1"
 	cd "${ZSH}/custom/$1"
 	git_dir=$(basename "$2" | sed 's/\.git$//')
 	if [ ! -d "${git_dir}" ]; then

@@ -55,13 +55,6 @@ else
 
 	# INSTALL PYTHON VIA PYENV
 	echo "Installing python via pyenv"
-	# zlib_dev_path="$(nix eval -f '<nixpkgs>' --raw zlib.dev --extra-experimental-features nix-command)"
-	# zlib_out_path="$(nix eval -f '<nixpkgs>' --raw zlib.out --extra-experimental-features nix-command)"
-	# openssl_path="$(nix eval -f '<nixpkgs>' --raw openssl --extra-experimental-features nix-command)"
-	# CFLAGS="-I${zlib_dev_path}/include -I${openssl_path}" \
-	# CPPFLAGS="-I${zlib_dev_path}/include" \
-	# LDFLAGS="-L${zlib_dev_path}/lib -L${zlib_out_path}/lib" \
-	# 	pyenv install ${default_python_version}
 	pyenv install ${default_python_version}
 fi
 

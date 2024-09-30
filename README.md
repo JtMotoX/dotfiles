@@ -4,7 +4,7 @@ This should work on **Windows** (wsl2), **macOS**, and **Linux** (any distro).
 
 This automatically installs and configures the following:
 
-- brew (*if macos*)
+- brew
 - bourne shell (*dash or busybox*)
 - pyenv
 - python
@@ -12,8 +12,7 @@ This automatically installs and configures the following:
 - oh-my-zsh
 - ansible
 - vim
-- nix
-- *all the packages listed in [packages.nix](configs/packages.nix)*
+- *all the packages listed in [brewfile](configs/brewfile) and [brewfile-linux](configs/brewfile-linux) or [brewfile-mac](configs/brewfile-mac)*
 - *all the aliases and functions listed in [sh_profile_custom](configs/sh_profile_custom)*
 
 ---
@@ -45,35 +44,23 @@ Spin up a container and execute `~/dotfiles/setup.sh`
 Alpine:
 
 ```bash
-docker run --rm -it -v "$(pwd):/dotfiles:ro" alpine sh -c "apk add --no-cache sudo && adduser -D myuser -u $(id -u) -g $(id -g) -s \$(command -v ash) && echo 'myuser ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/myuser && ln -s /dotfiles /home/myuser/dotfiles && su - myuser"
+docker run --rm -it -v "$(pwd):/dotfiles:ro" alpine sh -c "apk add --no-cache sudo && adduser -D myuser -u $(id -u) -g $(id -g) -s \$(command -v ash) && echo 'myuser ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/myuser && ln -s /dotfiles /home/myuser/dotfiles && echo 'Ready for testing' && su - myuser"
 ```
 
 Ubuntu:
 
 ```bash
-docker run --rm -it -v "$(pwd):/dotfiles:ro" ubuntu sh -c "apt-get update && apt-get install -y sudo && useradd -m myuser -u $(id -u) -g $(id -g) -s \$(command -v bash) && echo 'myuser ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/myuser && ln -s /dotfiles /home/myuser/dotfiles && su - myuser"
+docker run --rm -it -v "$(pwd):/dotfiles:ro" ubuntu sh -c "apt-get update && apt-get install -y sudo && useradd -m myuser -u $(id -u) -g $(id -g) -s \$(command -v bash) && echo 'myuser ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/myuser && ln -s /dotfiles /home/myuser/dotfiles && echo 'Ready for testing' && su - myuser"
 ```
 
 Arch:
 
 ```bash
-docker run --rm -it -v "$(pwd):/dotfiles:ro" archlinux sh -c "pacman -Syu --noconfirm --needed sudo && if ! getent group $(id -g) >/dev/null 2>&1; then groupadd -g $(id -g) mygroup; fi && useradd -m -u $(id -u) -g $(id -g) -N -s \$(command -v bash) myuser && echo 'myuser ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/myuser && ln -s /dotfiles /home/myuser/dotfiles && su - myuser"
+docker run --rm -it -v "$(pwd):/dotfiles:ro" archlinux sh -c "pacman -Syu --noconfirm --needed sudo && if ! getent group $(id -g) >/dev/null 2>&1; then groupadd -g $(id -g) mygroup; fi && useradd -m -u $(id -u) -g $(id -g) -N -s \$(command -v bash) myuser && echo 'myuser ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/myuser && ln -s /dotfiles /home/myuser/dotfiles && echo 'Ready for testing' && su - myuser"
 ```
 
 Alma:
 
 ```bash
-docker run --rm -it -v "$(pwd):/dotfiles:ro" almalinux sh -c "yum install -y sudo && sed -i -E 's/^((UID|GID)_MIN\s*).*$/\11/' /etc/login.defs && if ! getent group $(id -g) >/dev/null 2>&1; then groupadd -g $(id -g) mygroup; fi && useradd -m -u $(id -u) -g $(id -g) -N -s \$(command -v bash) myuser && echo 'myuser ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/myuser && chmod 0440 /etc/sudoers.d/myuser && ln -s /dotfiles /home/myuser/dotfiles && su - myuser"
-```
-
----
-
-## Troubleshooting
-
-#### Dual-booting MacOS/MacOS causes volume collision
-
-The default nix volume name is `Nix Store`. For the 2nd OS, just specify a custom label before running the installer to avoid the collision:
-
-```bash
-export NIX_VOLUME_LABEL='Nix Store Personal'
+docker run --rm -it -v "$(pwd):/dotfiles:ro" almalinux sh -c "yum install -y sudo && sed -i -E 's/^((UID|GID)_MIN\s*).*$/\11/' /etc/login.defs && if ! getent group $(id -g) >/dev/null 2>&1; then groupadd -g $(id -g) mygroup; fi && useradd -m -u $(id -u) -g $(id -g) -N -s \$(command -v bash) myuser && echo 'myuser ALL=(ALL) NOPASSWD: ALL' >/etc/sudoers.d/myuser && chmod 0440 /etc/sudoers.d/myuser && ln -s /dotfiles /home/myuser/dotfiles && echo 'Ready for testing' && su - myuser"
 ```

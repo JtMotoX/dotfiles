@@ -39,6 +39,10 @@ alias yqc='docker run --rm -i backplane/pygmentize -l yaml'
 
 alias clear='printf "\033c"' # workaround that prevents the original clear command from clearing the tmux history
 
+# FIX LOCALE WARNINGS
+export LC_CTYPE=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
 # GITLEAKS REPO SCANNER
 if [ "$(uname)" = "Darwin" ]; then
     alias glscan='docker run --rm -it -v "$HOME/Downloads:$HOME/Downloads" -v "$(pwd):$(pwd)" -w "$(pwd)" -u $(id -u):$(id -g) -e repo_scan_log_dir="$HOME/Downloads" -e no_git -e secrets_in_logs docker-ngdc.repo.east1.ncloud.netapp.com/devexp-engg/gitleaks-repo-scanner:latest'
@@ -574,31 +578,24 @@ if test -d $HOME/.npm-packages/bin; then
 	export PATH="$HOME/.npm-packages/bin:$PATH"
 fi
 
-# SETUP BREW FOR LINUX
-if test -f /home/linuxbrew/.linuxbrew/bin/brew; then
-	eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-fi
-
-# SETUP BREW FOR macOS Apple Silicon
-if test -f /opt/homebrew/bin/brew; then
-	eval "$(/opt/homebrew/bin/brew shellenv)"
-fi
-
-# SETUP BREW FOR MAC
+# SETUP BREW
 if type brew &>/dev/null; then
-	export PATH="$(brew --prefix)/bin:$PATH"
-	export PATH="$(brew --prefix)/opt/mysql-client@5.7/bin:$PATH"
-	export PATH="$(brew --prefix)/opt/findutils/libexec/gnubin:$PATH" # USE GNU FIND (must first do: brew install findutils)
-	export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH" # USE GNU SED (must first do: brew install gnu-sed)
-	export PATH="$(brew --prefix)/opt/gnu-tar/libexec/gnubin:$PATH" # USE GNU TAR (must first do: brew install gnu-tar)
-	export PATH="$(brew --prefix)/opt/gnu-getopt/bin:$PATH" # USE GNU GETOPT (must first do: brew install getopt)
-	export PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH" # USE GNU READLINK (must first do: brew install coreutils)
-	export PATH="$(brew --prefix)/opt/grep/libexec/gnubin:$PATH" # USE GNU GREP (must first do: brew install grep)
-	export PATH="$(brew --prefix)/opt/gnupg@2.2/bin:$PATH" # USE LEGACY GPG
-	export PATH="$(brew --prefix)/opt/helm@2/bin:$PATH" # NEED TO RUN 'helm init --client-only' AFTER INSTALLING
-	
+	if [ "$(uname)" = "Darwin" ]; then
+		export PATH="$(brew --prefix)/bin:$PATH"
+		export PATH="$(brew --prefix)/opt/mysql-client@5.7/bin:$PATH"
+		export PATH="$(brew --prefix)/opt/findutils/libexec/gnubin:$PATH" # USE GNU FIND (must first do: brew install findutils)
+		export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH" # USE GNU SED (must first do: brew install gnu-sed)
+		export PATH="$(brew --prefix)/opt/gnu-tar/libexec/gnubin:$PATH" # USE GNU TAR (must first do: brew install gnu-tar)
+		export PATH="$(brew --prefix)/opt/gnu-getopt/bin:$PATH" # USE GNU GETOPT (must first do: brew install getopt)
+		export PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH" # USE GNU READLINK (must first do: brew install coreutils)
+		export PATH="$(brew --prefix)/opt/grep/libexec/gnubin:$PATH" # USE GNU GREP (must first do: brew install grep)
+		export PATH="$(brew --prefix)/opt/gnupg@2.2/bin:$PATH" # USE LEGACY GPG
+		export PATH="$(brew --prefix)/opt/helm@2/bin:$PATH" # NEED TO RUN 'helm init --client-only' AFTER INSTALLING
+		alias gnu-grep="$(brew --prefix 2>/dev/null)/opt/grep/libexec/gnubin/grep --color=auto"
+	fi
+
 	alias brewu='brew update; brew upgrade; brew upgrade --cask --greedy; brew autoremove'
-	alias gnu-grep="$(brew --prefix 2>/dev/null)/opt/grep/libexec/gnubin/grep --color=auto"
+
 fi
 
 export PATH="$HOME/.local/bin:$PATH"

@@ -63,14 +63,6 @@ install_package() {
     fi
 }
 
-# FUNCTION TO LOAD NIX ENVIRONMENT
-load_nix_env() {
-    if [ -f '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
-        . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
-    elif [ -f ~/.nix-profile/etc/profile.d/nix.sh ]; then
-        . ~/.nix-profile/etc/profile.d/nix.sh
-    fi
-}
 
 # MAKE SURE WE ARE NOT ROOT
 if [ "$(whoami)" = "root" ]; then
@@ -137,51 +129,54 @@ fi
 
 reload_needed="false"
 
+# INSTALL SOME DEPENDENCIES
+install_package curl
+install_package git
+install_package bash
+
+# CONFIGURE LOCALES
+install_package locales || install_package glibc-langpack-en
+if locale-gen --help >/dev/null 2>&1; then
+    sudo sed -i -E '/^#\s*en_US.UTF-8 UTF-8/s/^#\s*//' /etc/locale.gen
+    sudo locale-gen
+fi
+
 # INSTALL PACKAGE REPOS
 ./scripts/repos-install.sh
 
+# INSTALL BREW
+. ./scripts/brew-source.sh
+./scripts/brew-install.sh
+. ./scripts/brew-source.sh
+
+# ALLOW SUDO TO USE BREW PACKAGES
+if [ -d "$(brew --prefix)/bin" ] && ! sudo grep -q "$(brew --prefix)/bin" /etc/sudoers; then sudo sed -i.bak 's#\(Defaults\s*secure_path=".*\)"#\1:'$(brew --prefix)'/bin"#' /etc/sudoers; fi
+if [ -d "$(brew --prefix)/sbin" ] && ! sudo grep -q "$(brew --prefix)/sbin" /etc/sudoers; then sudo sed -i.bak 's#\(Defaults\s*secure_path=".*\)"#\1:'$(brew --prefix)'/sbin"#' /etc/sudoers; fi
+
+# INSTALL XCODE COMMAND LINE TOOLS NEEDED FOR BREW
 if [ "$(uname)" = "Darwin" ]; then
-    if ! eval "$(/opt/homebrew/bin/brew shellenv)" 2>/dev/null; then
-        ./scripts/brew-install.sh
-    fi
     if ! xcode-select -p >/dev/null 2>&1; then
         xcode-select --install
     fi
-    ./scripts/brew-restore.sh
 fi
 
-# INSTALL NIX DEPENDENCIES
-install_package xz || install_package xz-utils
-install_package curl
+# RESTORE BREW PACKAGES
+./scripts/brew-restore.sh
 
-# INSTALL NIX IF NOT EXISTS
-load_nix_env
-if ! nix-shell -p --run true >/dev/null 2>&1; then
-    ./scripts/nix-uninstall.sh
-    # for nix_key in $(env | grep '^NIX_' | awk -F= '{print $1}'); do
-    #     echo "Unsetting '${nix_key}' . . ."
-    #     unset ${nix_key}
-    # done
-    ./scripts/nix-install.sh
-    reload_needed="true"
-fi
-load_nix_env
-# ./scripts/nix-packages-uninstall.sh
-./scripts/nix-packages-install.sh
+# INSTALL BOURNE SHELL
+install_package dash
+./scripts/bourne-sh-install.sh
 
-# MAKE SURE GIT WAS INSTALLED
-if ! command -v git | grep 'nix' >/dev/null 2>&1; then
-    echo "ERROR: It looks like packages were not installed successfully."
-    exit 1
-fi
-
-# ./scripts/bourne-sh-install.sh
 install_package zsh
+if ! type chsh >/dev/null 2>&1; then
+    install_package util-linux-user || true 
+fi
 ./scripts/zsh-install.sh
 ./scripts/oh-my-zsh-install.sh
 ./scripts/tmux-configure.sh
 ./scripts/create-symbolic-links.sh --override
 ./scripts/dcomp-install.sh
+./scripts/kubernetes-tools.sh
 ./scripts/pyenv-configure.sh "3.10.3"
 
 echo

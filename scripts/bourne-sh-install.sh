@@ -8,12 +8,6 @@ is_bourne_shell() {
 	! sh -c 'a="a";echo ${a[@]}'>/dev/null 2>&1
 }
 
-# CHECK IF SH IS BOURNE SHELL
-if is_bourne_shell; then
-	echo "Bourne shell is already set"
-	exit 0
-fi
-
 if ! command -v dash >/dev/null 2>&1; then
 	echo "Could not find 'dash'"
 	exit 1
@@ -21,6 +15,11 @@ fi
 
 # CHECK IF MACOS VERSION IS SUPPORTED
 if [ "$(uname)" = "Darwin" ]; then
+	# CHECK IF SH IS BOURNE SHELL
+	if is_bourne_shell; then
+		echo "Bourne shell is already set"
+		exit 0
+	fi
 	# CHECK MACOS VERSION SINCE DASH WAS NOT INTRODUCED UNTIL CATALINA
 	macos_version="$(sw_vers -productVersion)"
 	macos_major_version="$(echo "${macos_version}" | cut -d. -f1)"
@@ -36,27 +35,26 @@ if [ "$(uname)" = "Darwin" ]; then
 else
 	# SWITCH TO DASH
 	sh_path="/bin/sh"
-	echo "Setting ${sh_path} to $(basename "$(command -v dash)")"
+	if realpath "${sh_path}" | grep -q -E "\/dash$"; then
+		echo "Bourne shell is already set"
+		exit 0
+	fi
+	dash_path="/bin/dash"
+	if ! [ -f "${dash_path}" ]; then
+		dash_path="$(command -v dash 2>/dev/null || true)"
+		if [ -z "${dash_path}" ]; then
+			echo "Could not find 'dash'"
+			exit 1
+		fi
+	fi
+	echo "Setting ${sh_path} to ${dash_path}"
 	sudo touch "$(dirname "${sh_path}")/test" && sudo rm -f "$(dirname "${sh_path}")/test"
 	if [ -f "${sh_path}.bak" ]; then
 		sudo rm -f "${sh_path}"
+	else
+		sudo mv "${sh_path}" "${sh_path}.bak"
 	fi
-	sudo mv "${sh_path}" "${sh_path}.bak"
-	sudo ln -s "$(command -v dash)" "${sh_path}"
-fi
-
-# REPLACE NIX SH WITH NIX DASH
-sh_path="$(command -v sh)"
-if echo "${sh_path}" | grep '.nix-profile' >/dev/null 2>&1; then
-	if [ -L "${sh_path}" ]; then
-		nix_dash_package_path="$(nix eval -f '<nixpkgs>' --raw dash --extra-experimental-features nix-command 2>/dev/null || true)"
-		nix_dash_path="${nix_dash_package_path}/bin/dash"
-		if [ "${nix_dash_package_path}" != "" ] && [ -f "${nix_dash_path}" ]; then
-			echo "Setting nix sh to nix dash"
-			sudo rm -f "${sh_path}"
-			sudo ln -s "${nix_dash_path}" "${sh_path}"
-		fi
-	fi
+	sudo ln -s "${dash_path}" "${sh_path}"
 fi
 
 # MAKE SURE THAT SH IS NOW BOURNE SHELL
