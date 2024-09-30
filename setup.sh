@@ -135,7 +135,7 @@ install_package git
 install_package bash
 
 # CONFIGURE LOCALES
-install_package locales || install_package glibc-langpack-en
+install_package locales || install_package glibc-langpack-en || true
 if locale-gen --help >/dev/null 2>&1; then
     sudo sed -i -E '/^#\s*en_US.UTF-8 UTF-8/s/^#\s*//' /etc/locale.gen
     sudo locale-gen
