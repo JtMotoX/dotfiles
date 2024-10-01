@@ -15,11 +15,13 @@ else
 fi
 
 # CREATE SYMLINK
-DCOMP_BIN_FILE="${HOME}/.local/bin/dcomp"
+LOCAL_BIN_DIR="${HOME}/.local/bin"
+DCOMP_BIN_FILE="${LOCAL_BIN_DIR}/dcomp"
 if [ -f "${DCOMP_BIN_FILE}" ]; then
 	rm "${DCOMP_BIN_FILE}"
 fi
-mkdir -p "$(dirname "${DCOMP_BIN_FILE}")"
+sudo mkdir -p "${LOCAL_BIN_DIR}"
+sudo chown $(id -u):$(id -g) "${LOCAL_BIN_DIR}"
 ln -s "${DCOMP_DIR}/dcomp.sh" "${DCOMP_BIN_FILE}"
 export PATH="$(dirname "${DCOMP_BIN_FILE}"):${PATH}"
 
