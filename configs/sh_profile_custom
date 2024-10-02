@@ -456,7 +456,12 @@ update() {
 	fi
 	if type brew &>/dev/null; then
 		echo "Updating brew..."
-		brew update && brew upgrade
+		brew update
+		brew upgrade
+		if [ "$(uname)" = "Darwin" ]; then
+			brew upgrade --cask --greedy
+		fi
+		brew autoremove
 	fi
 	if type port &>/dev/null; then
 		echo "Updating port..."
@@ -592,10 +597,10 @@ if type brew &>/dev/null; then
 		export PATH="$(brew --prefix)/opt/gnupg@2.2/bin:$PATH" # USE LEGACY GPG
 		export PATH="$(brew --prefix)/opt/helm@2/bin:$PATH" # NEED TO RUN 'helm init --client-only' AFTER INSTALLING
 		alias gnu-grep="$(brew --prefix 2>/dev/null)/opt/grep/libexec/gnubin/grep --color=auto"
+		alias brewu='brew update; brew upgrade; brew upgrade --cask --greedy; brew autoremove'
+	else
+		alias brewu='brew update; brew upgrade; brew autoremove'
 	fi
-
-	alias brewu='brew update; brew upgrade; brew upgrade --cask --greedy; brew autoremove'
-
 fi
 
 export PATH="$HOME/.local/bin:$PATH"
