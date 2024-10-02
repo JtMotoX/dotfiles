@@ -39,6 +39,8 @@ alias yqc='docker run --rm -i backplane/pygmentize -l yaml'
 
 alias clear='printf "\033c"' # workaround that prevents the original clear command from clearing the tmux history
 
+alias bat='bat --paging=always'
+
 # FIX LOCALE WARNINGS
 export LC_CTYPE=en_US.UTF-8
 export LC_ALL=en_US.UTF-8
