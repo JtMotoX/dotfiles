@@ -140,10 +140,14 @@ install_package bash
 
 # CONFIGURE LOCALES
 if [ "$(uname)" = "Linux" ]; then
-    install_package locales || install_package glibc-langpack-en || true
+    if ! locale-gen --help >/dev/null 2>&1; then
+        install_package locales || install_package glibc-langpack-en || true
+    fi
     if locale-gen --help >/dev/null 2>&1; then
-        sudo sed -i -E '/^#\s*en_US.UTF-8 UTF-8/s/^#\s*//' /etc/locale.gen
-        sudo locale-gen
+        if ! cat /etc/locale.gen | grep -q '^en_US.UTF-8 UTF-8'; then
+            sudo sed -i -E '/^#\s*en_US.UTF-8 UTF-8/s/^#\s*//' /etc/locale.gen
+            sudo locale-gen
+        fi
     fi
 fi
 
@@ -155,9 +159,14 @@ fi
 ./scripts/brew-install.sh
 . ./scripts/brew-source.sh
 
+if [ "${HOMEBREW_PREFIX}" != "$(brew --prefix)" ]; then
+    echo "ERROR: Failed to source Homebrew."
+    exit 1
+fi
+
 # ALLOW SUDO TO USE BREW PACKAGES
-if [ -d "$(brew --prefix)/bin" ] && ! sudo grep -q "$(brew --prefix)/bin" /etc/sudoers; then sudo sed -i.bak 's#\(Defaults\s*secure_path=".*\)"#\1:'$(brew --prefix)'/bin"#' /etc/sudoers; fi
-if [ -d "$(brew --prefix)/sbin" ] && ! sudo grep -q "$(brew --prefix)/sbin" /etc/sudoers; then sudo sed -i.bak 's#\(Defaults\s*secure_path=".*\)"#\1:'$(brew --prefix)'/sbin"#' /etc/sudoers; fi
+if [ -d "${HOMEBREW_PREFIX}/bin" ] && ! sudo grep -q "${HOMEBREW_PREFIX}/bin" /etc/sudoers; then sudo sed -i.bak 's#\(Defaults\s*secure_path=".*\)"#\1:'${HOMEBREW_PREFIX}'/bin"#' /etc/sudoers; fi
+if [ -d "${HOMEBREW_PREFIX}/sbin" ] && ! sudo grep -q "${HOMEBREW_PREFIX}/sbin" /etc/sudoers; then sudo sed -i.bak 's#\(Defaults\s*secure_path=".*\)"#\1:'${HOMEBREW_PREFIX}'/sbin"#' /etc/sudoers; fi
 
 # INSTALL XCODE COMMAND LINE TOOLS NEEDED FOR BREW
 if [ "$(uname)" = "Darwin" ]; then
