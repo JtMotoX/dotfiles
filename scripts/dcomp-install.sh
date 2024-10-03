@@ -20,8 +20,24 @@ DCOMP_BIN_FILE="${LOCAL_BIN_DIR}/dcomp"
 if [ -f "${DCOMP_BIN_FILE}" ]; then
 	rm "${DCOMP_BIN_FILE}"
 fi
-sudo mkdir -p "${LOCAL_BIN_DIR}"
-sudo chown $(id -u):$(id -g) "${LOCAL_BIN_DIR}"
+
+# CREATE THE LOCAL BIN DIRECTORY IF IT DOESN'T EXIST
+if [ ! -d "${LOCAL_BIN_DIR}" ]; then
+	echo "Creating '${LOCAL_BIN_DIR}' . . ."
+	sudo mkdir -p "${LOCAL_BIN_DIR}"
+fi
+
+# CHANGE THE OWNER OF THE LOCAL BIN DIRECTORY IF NOT ALREADY
+if [ "$(uname)" = "Darwin" ]; then
+	OWNER_GROUP="$(stat -f %u:%g "${LOCAL_BIN_DIR}")"
+else
+	OWNER_GROUP="$(stat -c %u:%g "${LOCAL_BIN_DIR}")"
+fi
+if [ "${OWNER_GROUP}" != "$(id -u):$(id -g)" ]; then
+	echo "Setting owner of '${LOCAL_BIN_DIR}' . . ."
+	sudo chown $(id -u):$(id -g) "${LOCAL_BIN_DIR}"
+fi
+
 ln -s "${DCOMP_DIR}/dcomp.sh" "${DCOMP_BIN_FILE}"
 export PATH="$(dirname "${DCOMP_BIN_FILE}"):${PATH}"
 

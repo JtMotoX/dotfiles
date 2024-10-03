@@ -76,6 +76,7 @@ if ! command -v sudo >/dev/null 2>&1; then
 fi
 
 # MAKE SURE WE HAVE SUDO
+echo "Make sure we have root access . . ."
 if [ "$(sudo whoami)" != "root" ]; then
     echo
     echo "You do not seem to have sudo rights."
@@ -130,8 +131,10 @@ fi
 reload_needed="false"
 
 # CREATE SOME REQUIRED DIRECTORIES
-sudo mkdir -p $HOME/.cache $HOME/.local/bin
-sudo chown $(id -u):$(id -g) $HOME/.cache $HOME/.local/bin
+required_directories="$HOME/.cache $HOME/.local/bin"
+echo "Create required directories . . ."
+sudo mkdir -p ${required_directories}
+sudo chown $(id -u):$(id -g) ${required_directories}
 
 # INSTALL SOME DEPENDENCIES
 install_package curl
@@ -144,7 +147,7 @@ if [ "$(uname)" = "Linux" ]; then
         install_package locales || install_package glibc-langpack-en || true
     fi
     if locale-gen --help >/dev/null 2>&1; then
-        if ! cat /etc/locale.gen | grep -q '^en_US.UTF-8 UTF-8'; then
+        if ! cat /etc/locale.gen 2>/dev/null | grep -q '^en_US.UTF-8 UTF-8'; then
             sudo sed -i -E '/^#\s*en_US.UTF-8 UTF-8/s/^#\s*//' /etc/locale.gen
             sudo locale-gen
         fi
@@ -165,6 +168,7 @@ if [ "${HOMEBREW_PREFIX}" != "$(brew --prefix)" ]; then
 fi
 
 # ALLOW SUDO TO USE BREW PACKAGES
+echo "Allow sudo to use brew packages . . ."
 if [ -d "${HOMEBREW_PREFIX}/bin" ] && ! sudo grep -q "${HOMEBREW_PREFIX}/bin" /etc/sudoers; then sudo sed -i.bak 's#\(Defaults\s*secure_path=".*\)"#\1:'${HOMEBREW_PREFIX}'/bin"#' /etc/sudoers; fi
 if [ -d "${HOMEBREW_PREFIX}/sbin" ] && ! sudo grep -q "${HOMEBREW_PREFIX}/sbin" /etc/sudoers; then sudo sed -i.bak 's#\(Defaults\s*secure_path=".*\)"#\1:'${HOMEBREW_PREFIX}'/sbin"#' /etc/sudoers; fi
 
