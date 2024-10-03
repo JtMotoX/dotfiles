@@ -44,7 +44,7 @@ test -d "$HOME/.local/bin" && export PATH="$HOME/.local/bin:${PATH}"
 eval "$(zoxide init --cmd cd zsh)"
 
 # If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:$(brew --prefix 2>/dev/null)/bin:$PATH
+# export PATH=$HOME/bin:${HOMEBREW_PREFIX}/bin:$PATH
 
 # Path to your oh-my-zsh installation.
 export ZSH="${HOME}/.oh-my-zsh"
@@ -148,7 +148,7 @@ source ~/.oh-my-zsh/custom/themes/zsh-jt-themes/jt-highlighting-custom.zsh
 
 # User configuration
 
-# export MANPATH="$(brew --prefix 2>/dev/null)/man:$MANPATH"
+# export MANPATH="${HOMEBREW_PREFIX}/man:$MANPATH"
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
@@ -191,7 +191,7 @@ setopt rm_star_silent
 # KUBE_PS1_NS_COLOR=yellow
 # KUBE_PS1_SYMBOL_ENABLE=false
 # KUBE_PS1_SEPARATOR=''
-# source "$(brew --prefix 2>/dev/null)/opt/kube-ps1/share/kube-ps1.sh"
+# source "${HOMEBREW_PREFIX}/opt/kube-ps1/share/kube-ps1.sh"
 # kube_ps1_autohide() { kube_ps1 | sed -r 's/^(.*}N\/A%.*:.*}(N\/A|default)%.*)$//' }
 # PS1='$(kube_ps1_autohide)'$PS1
 
@@ -207,8 +207,8 @@ preexec () { print -n "\033]0;${HOSTNAME_SHORT} : ${1:0:150}\007"; }
 
 # FIX ZSH-COMPLETIONS FOR APPLE SILICON
 if [[ $(uname -m) == 'arm64' ]] && type brew &>/dev/null; then
-  FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
-  FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
+  FPATH=${HOMEBREW_PREFIX}/share/zsh-completions:$FPATH
+  FPATH=${HOMEBREW_PREFIX}/share/zsh/site-functions:$FPATH
   autoload -Uz compinit
   compaudit 2>/dev/null | while read -r d; do
     chmod g-w "$d"

@@ -533,9 +533,12 @@ kube_reload() {
 alias kube-reload="kube_reload"
 kube-reload -s
 
-# macOS HOMEBREW
 if type brew >/dev/null 2>&1; then
-	export PATH="$(brew --prefix 2>/dev/null)/sbin:$PATH"
+	if [ "${HOMEBREW_PREFIX}" != "$(brew --prefix)" ]; then
+		echo "ERROR: Failed to source Homebrew."
+	fi
+	# macOS HOMEBREW
+	export PATH="${HOMEBREW_PREFIX}/sbin:$PATH"
 fi
 
 # INSTALL PYENV
@@ -588,17 +591,17 @@ fi
 # SETUP BREW
 if type brew &>/dev/null; then
 	if [ "$(uname)" = "Darwin" ]; then
-		export PATH="$(brew --prefix)/bin:$PATH"
-		export PATH="$(brew --prefix)/opt/mysql-client@5.7/bin:$PATH"
-		export PATH="$(brew --prefix)/opt/findutils/libexec/gnubin:$PATH" # USE GNU FIND (must first do: brew install findutils)
-		export PATH="$(brew --prefix)/opt/gnu-sed/libexec/gnubin:$PATH" # USE GNU SED (must first do: brew install gnu-sed)
-		export PATH="$(brew --prefix)/opt/gnu-tar/libexec/gnubin:$PATH" # USE GNU TAR (must first do: brew install gnu-tar)
-		export PATH="$(brew --prefix)/opt/gnu-getopt/bin:$PATH" # USE GNU GETOPT (must first do: brew install getopt)
-		export PATH="$(brew --prefix)/opt/coreutils/libexec/gnubin:$PATH" # USE GNU READLINK (must first do: brew install coreutils)
-		export PATH="$(brew --prefix)/opt/grep/libexec/gnubin:$PATH" # USE GNU GREP (must first do: brew install grep)
-		export PATH="$(brew --prefix)/opt/gnupg@2.2/bin:$PATH" # USE LEGACY GPG
-		export PATH="$(brew --prefix)/opt/helm@2/bin:$PATH" # NEED TO RUN 'helm init --client-only' AFTER INSTALLING
-		alias gnu-grep="$(brew --prefix 2>/dev/null)/opt/grep/libexec/gnubin/grep --color=auto"
+		export PATH="${HOMEBREW_PREFIX}/bin:$PATH"
+		export PATH="${HOMEBREW_PREFIX}/opt/mysql-client@5.7/bin:$PATH"
+		export PATH="${HOMEBREW_PREFIX}/opt/findutils/libexec/gnubin:$PATH" # USE GNU FIND (must first do: brew install findutils)
+		export PATH="${HOMEBREW_PREFIX}/opt/gnu-sed/libexec/gnubin:$PATH" # USE GNU SED (must first do: brew install gnu-sed)
+		export PATH="${HOMEBREW_PREFIX}/opt/gnu-tar/libexec/gnubin:$PATH" # USE GNU TAR (must first do: brew install gnu-tar)
+		export PATH="${HOMEBREW_PREFIX}/opt/gnu-getopt/bin:$PATH" # USE GNU GETOPT (must first do: brew install getopt)
+		export PATH="${HOMEBREW_PREFIX}/opt/coreutils/libexec/gnubin:$PATH" # USE GNU READLINK (must first do: brew install coreutils)
+		export PATH="${HOMEBREW_PREFIX}/opt/grep/libexec/gnubin:$PATH" # USE GNU GREP (must first do: brew install grep)
+		export PATH="${HOMEBREW_PREFIX}/opt/gnupg@2.2/bin:$PATH" # USE LEGACY GPG
+		export PATH="${HOMEBREW_PREFIX}/opt/helm@2/bin:$PATH" # NEED TO RUN 'helm init --client-only' AFTER INSTALLING
+		alias gnu-grep="${HOMEBREW_PREFIX}/opt/grep/libexec/gnubin/grep --color=auto"
 		alias brewu='brew update; brew upgrade; brew upgrade --cask --greedy; brew autoremove'
 	else
 		alias brewu='brew update; brew upgrade; brew autoremove'
