@@ -21,9 +21,11 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
+changes_made="false"
+
 # Check if the link already exists and prompt for override if necessary
 check_create_needed() {
-	[ "$(readlink -f $1)" = "$(readlink -f $2)" ] && { echo "'$1' is already linked"; return 0; }
+	[ "$(readlink -f $1)" = "$(readlink -f $2)" ] && { return 0; }
 	test -f "$2" || { rm -f "$2"; return 1; }
 	echo "'$2' already exists."
 	if [ "${OVERRIDE}" = true ]; then
@@ -50,8 +52,7 @@ create_link() {
 		return
 	fi
 	if [ ! -d "$(dirname "$2")" ]; then
-		echo "Directory not found for: $2"
-		return
+		mkdir -p "$(dirname "$2")"
 	fi
 	SRC="$(cd "$(dirname "$1")" && printf $(pwd) && printf "/$(basename "$1")")"
 	DST="$(cd "$(dirname "$2")" && printf $(pwd) && printf "/$(basename "$2")")"
@@ -61,6 +62,7 @@ create_link() {
 		SRC="${SRC_RELATIVE}"
 	fi
 	ln -s "${SRC}" "$2"
+	changes_made="true"
 }
 
 create_link ansible.cfg ~/.ansible.cfg
@@ -75,3 +77,7 @@ create_link tmux.conf ~/.tmux.conf
 create_link zshrc ~/.zshrc
 create_link vimrc ~/.vimrc
 create_link Microsoft.PowerShell_profile.ps1 ~/.config/powershell/Microsoft.PowerShell_profile.ps1
+
+if [ "${changes_made}" = "false" ]; then
+	echo "All symbolic links are already created. No changes made."
+fi
