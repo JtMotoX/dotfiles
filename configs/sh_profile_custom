@@ -694,6 +694,12 @@ if type kubectl &>/dev/null; then
 	alias kx-test="kx_test"
 	alias kube-test="kx_test"
 
+	# KUBERNETES GET CURRENT NAMESPACE
+	kgn() {
+		NAMESPACE_CONTEXT="$(kubectl config view --minify --output 'jsonpath={..namespace}')"
+		echo "${NAMESPACE_CONTEXT}"
+	}
+
 	# KUBERNETES CLUSTER INFO
 	ki() {
 		# CLUSTER_NAME="$(kubectl get daemonset instana-agent -n instana-agent -o jsonpath='{.spec.template.spec.containers[*].env[?(@.name=="INSTANA_KUBERNETES_CLUSTER_NAME")].value}')"
