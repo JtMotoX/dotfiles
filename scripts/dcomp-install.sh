@@ -28,7 +28,7 @@ if [ ! -d "${LOCAL_BIN_DIR}" ]; then
 fi
 
 # CHANGE THE OWNER OF THE LOCAL BIN DIRECTORY IF NOT ALREADY
-if [ "$(uname)" = "Darwin" ]; then
+if { stat 2>&1 || true; } | grep -q 'stdin'; then
 	OWNER_GROUP="$(stat -f %u:%g "${LOCAL_BIN_DIR}")"
 else
 	OWNER_GROUP="$(stat -c %u:%g "${LOCAL_BIN_DIR}")"

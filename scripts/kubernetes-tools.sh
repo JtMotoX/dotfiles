@@ -10,13 +10,15 @@ velero_version="v1.14.0"
 
 # GET OS AND ARCH
 os=$(uname -s | tr '[:upper:]' '[:lower:]')
-if [ "$(uname -m)" = "aarch64" ]; then arch="arm64"; else arch="amd64"; fi
+if [ "$(uname -m)" = "aarch64" ] || [ "$(uname -m)" = "arm64" ]; then arch="arm64"; else arch="amd64"; fi
 
 # SET SOME DEFAULTS
 install_dir="/usr/local/bin"
 kubectl_version="${kubectl_version:=$(curl -L -s https://dl.k8s.io/release/stable.txt)}"
 velero_version="${velero_version:=$(curl -s https://api.github.com/repos/vmware-tanzu/velero/releases/latest | grep tag_name | cut -d '"' -f 4)}"
 helm_version="${helm_version:=$(curl -s https://api.github.com/repos/helm/helm/releases/latest | grep tag_name | cut -d '"' -f 4)}"
+
+if [ ! -d "${install_dir}" ]; then echo "Creating '${install_dir}'"; sudo mkdir -p "${install_dir}"; fi
 
 # INSTALL KUBECTL
 if kubectl version --client 2>/dev/null | grep -q -E "${kubectl_version}$"; then
