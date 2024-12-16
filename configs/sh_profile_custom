@@ -416,6 +416,7 @@ update() {
 		fi
 		SUDO="sudo"
 	fi
+	omz update
 	if type apt-get &>/dev/null; then
 		echo "Updating apt-get..."
 		$SUDO apt-get update && $SUDO apt-get upgrade -y && $SUDO apt-get autoremove -y
