@@ -83,6 +83,12 @@ CASE_SENSITIVE="true"
 # Uncomment the following line to disable bi-weekly auto-update checks.
 # DISABLE_AUTO_UPDATE="true"
 
+# Set omz update verbosity (default,minimal,silent)
+zstyle ':omz:update' verbose minimal
+
+# Set omz update mode (auto,reminder,disabled)
+zstyle ':omz:update' mode disabled
+
 # Uncomment the following line to automatically update without prompting.
 DISABLE_UPDATE_PROMPT="true"
 
