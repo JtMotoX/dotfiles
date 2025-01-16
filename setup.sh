@@ -77,7 +77,7 @@ fi
 
 # MAKE SURE WE HAVE SUDO
 echo "Make sure we have root access . . ."
-if [ "$(sudo whoami)" != "root" ]; then
+if ! sudo -v; then
     echo
     echo "You do not seem to have sudo rights."
     suders_file=""
