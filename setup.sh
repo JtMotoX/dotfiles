@@ -200,6 +200,4 @@ fi
 
 echo
 echo "Successfully finished dotfiles setup."
-echo "Launching zsh session . . ."
-cd "${ORIGINAL_DIR}"
-NO_ZSH_CLEAR=true zsh
+echo "You may need to restart your terminal session for some changes to apply."
