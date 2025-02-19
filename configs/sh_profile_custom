@@ -807,6 +807,10 @@ if type kubectl &>/dev/null; then
 	fi
 fi
 
+if type rancher &>/dev/null; then
+	alias rancher-login="rancher login \"$(kubectl config view --raw --minify -o json | jq -r '.clusters[0].cluster.server')\" --token \"$(kubectl config view --raw --minify -o json | jq -r '.users[0].user.token')\""
+fi
+
 if type kubectl &>/dev/null; then
 	# # FUNCTION TO SEARCH ALL CLUSTERS FOR NAMESPACE
 	# kxn() {
