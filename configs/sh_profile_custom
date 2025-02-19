@@ -90,10 +90,10 @@ dotu() {
 
 # FUNCTION TO GIVE VSC URL
 vsc() {
-	relpath="$1"
+	relpath=$@
 	if [ "${relpath}" = "" ]; then relpath="$(pwd)"; fi
 	if [ -f "${relpath}" ]; then relpath="$(dirname "${relpath}")"; fi
-	abspath="$(cd ${relpath} 2>/dev/null && pwd)"
+	abspath="$(eval cd ${relpath} 2>/dev/null && pwd)"
 	if [ "${abspath}" = "" ]; then echo "Path not found: '${relpath}'"; return 1; fi
 	if hostname -s | grep '^vmwdxp' >/dev/null 2>&1; then
 		tunnel_url="https://vsc:4443/?folder="
