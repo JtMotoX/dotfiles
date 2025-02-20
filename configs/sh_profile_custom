@@ -805,6 +805,15 @@ if type kubectl &>/dev/null; then
 		_kf() { _arguments "1: :($(kubectl get deployment,sts --no-headers | awk '{print $1}' | sed 's/\.apps//'))"; }
 		compdef _kf kf
 	fi
+
+	# SWITCH TO RMS OF CURRENT CLUSTER CONTEXT
+	kxrms() {
+		local CONTEXT_SERVER="$(kubectl config view --minify -o json | jq -r '.clusters[0].cluster.server')"
+		local RMS_SERVER="$(echo $CONTEXT_SERVER | sed -E 's/(.*\/)(c-[^\/ ]+).*$/\1local/')"
+		local RMS_CLUSTER="$(kubectl config view -o json | jq -r --arg CONTEXT_SERVER_RMS "${RMS_SERVER}" '.clusters[] | select(.cluster.server==$CONTEXT_SERVER_RMS) | .name')"
+		local RMS_CONTEXT="$(kubectl config view -o json | jq -r --arg RMS_CLUSTER "${RMS_CLUSTER}" '.contexts[] | select(.context.cluster==$RMS_CLUSTER) | .name')"
+		kx "${RMS_CONTEXT}"
+	}
 fi
 
 if type rancher &>/dev/null; then
