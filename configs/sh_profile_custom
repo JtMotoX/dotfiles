@@ -808,12 +808,13 @@ if type kubectl &>/dev/null; then
 fi
 
 if type rancher &>/dev/null; then
+	# LOG INTO RANCHER CLI USING CURRENT KUBECONFIG CONTEXT
 	rancher_login() {
 		local CONTEXT_SERVER="$(kubectl config view --minify -o json | jq -r '.clusters[0].cluster.server')"
 		local CONTEXT_TOKEN="$(kubectl config view --raw --minify -o json | jq -r '.users[0].user.token')"
 		local CONTEXT_NAMESPACE="$(kubectl config view --minify -o json | jq -r '.contexts[0].context.namespace //empty')"
 		local CONTEXT_CLUSTERID="$(k config view --minify -o json | jq -r '.clusters[0].cluster.server' | sed -E 's/.*\/(c-[^\/ ]*$)/\1/')"
-		local RANDOM_PROJECT_ENTRY="$((timeout -s SIGINT 2 rancher login "${CONTEXT_SERVER}" --token "${CONTEXT_TOKEN}" 2>&1 || true) | grep " ${CONTEXT_CLUSTERID}:" | head -n 1 | awk '{print $1}')"
+		local RANDOM_PROJECT_ENTRY="$((timeout -s SIGKILL 2 rancher login "${CONTEXT_SERVER}" --token "${CONTEXT_TOKEN}" 2>&1 || true) | grep " ${CONTEXT_CLUSTERID}:" | head -n 1 | awk '{print $1}')"
 		echo "Authenticating to '${CONTEXT_SERVER}'"
 		echo "${RANDOM_PROJECT_ENTRY}" | rancher login "${CONTEXT_SERVER}" --token "${CONTEXT_TOKEN}" | grep -v -E '^[0-9]+ ' | grep -v '^NUMBER' | grep -v '^Select'
 	}
