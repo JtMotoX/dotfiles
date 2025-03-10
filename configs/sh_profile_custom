@@ -543,6 +543,8 @@ if type brew >/dev/null 2>&1; then
 fi
 
 ## PYENV NOTES
+	## UPDATE PYENV VERSIONS
+		# pyenv update && git -C $(pyenv root) pull
 	## INSTALL PYENV
 		# brew install pyenv
 		# pyenv install 2.7.16
@@ -555,8 +557,6 @@ fi
 	## REMOVE VIRTUAL ENVIRONMENT
 		# pyenv uninstall myvirtualenv
 		# pyenv virtualenv-delete 3.6.4/envs/myvirtualenv
-	## UPDATE PYENV VERSIONS
-		# pyenv update && (cd $(pyenv root) && git pull)
 if test -d $HOME/.pyenv/bin; then
 	export PATH="$HOME/.pyenv/bin:$PATH"
 fi
