@@ -926,6 +926,12 @@ export VSCODE_CLI_USE_FILE_KEYCHAIN=1
 # RANCHER DESKTOP
 test -d ~/.rd/bin && export PATH="$(cd ~ && pwd)/.rd/bin:$PATH"
 
+# K9S
+if type k9s >/dev/null 2>&1; then
+	alias 9="k9s"
+	alias 9r="k9s --readonly"
+fi
+
 # KUBECTL KREW
 if test -d ~/.krew/bin; then
 	export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
