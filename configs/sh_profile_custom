@@ -706,6 +706,11 @@ if type kubectl &>/dev/null; then
 
 	# KUBERNETES CLUSTER INFO
 	ki() {
+		CURRENT_CONTEXT="$(kubectl config current-context 2>/dev/null || true)"
+		if [ "${CURRENT_CONTEXT}" = "" ]; then
+			echo "No current context found"
+			return 1
+		fi
 		# CLUSTER_NAME="$(kubectl get daemonset instana-agent -n instana-agent -o jsonpath='{.spec.template.spec.containers[*].env[?(@.name=="INSTANA_KUBERNETES_CLUSTER_NAME")].value}')"
 		CLUSTER_NAME="$(kubectl config view --minify -o jsonpath='{.clusters[].name}{"\n"}')"
 		# CLUSTER_API_URL="$(kubectl cluster-info | sed -r "s/\x1B\[[0-9;]*[mK]//g" | grep 'Kubernetes control plane' | sed 's/.*is running at //' | sed 's|/k8s/clusters/|/dashboard/c/|')"
@@ -718,6 +723,7 @@ if type kubectl &>/dev/null; then
 		KONG_ID="$(k get ingress -n kong-examples -o json | jq -r '.items[] | select(.spec.ingressClassName == "kong-internal") | .spec.rules[0].host' | grep -o -E 'gw[0-9]+' | head -n1)"
 		NAMESPACE_CONTEXT="$(kubectl config view --minify --output 'jsonpath={..namespace}')"
 		(
+			printf "Context:~${CURRENT_CONTEXT}\n"
 			printf "Cluster Name:~${CLUSTER_NAME}\n"
 			printf "Cluster API URL:~${CLUSTER_API_URL_FULL}\n"
 			printf "Cluster Web URL:~${CLUSTER_WEB_URL}\n"
