@@ -61,8 +61,8 @@ jwtdecode() {
 	if test ! -t 0; then JWT_STRING="$(cat)"; else JWT_STRING="$1"; fi
 	JWT_DOT_COUNT="$(echo "${JWT_STRING}" | grep -o "\." | wc -l)"
 	if [ "${JWT_DOT_COUNT}" -eq 2 ]; then
-		HEADER="$(echo "${JWT_STRING}" | cut -d "." -f 1 | base64 -d | jq)"
-		PAYLOAD="$(echo "${JWT_STRING}" | cut -d "." -f 2)"
+		HEADER="$(echo "${JWT_STRING}" | cut -d "." -f 1 | sed 's/$/==/' | base64 -d | jq)"
+		PAYLOAD="$(echo "${JWT_STRING}" | cut -d "." -f 2 | sed 's/$/==/' | base64 -d | jq)"
 		SIGNATURE="$(echo "${JWT_STRING}" | cut -d "." -f 3)"
 	elif [ "${JWT_DOT_COUNT}" -eq 0 ]; then
 		HEADER="na"
@@ -72,13 +72,7 @@ jwtdecode() {
 		echo "Invalid JWT string"
 		return 1
 	fi
-	PAYLOAD="$(echo "${PAYLOAD}====" | fold -w 4 | sed '$ d' | tr -d '\n' | base64 -d -i)"
-	# echo "Header:"
-	# if [ "${HEADER}" != "na" ] && type jq >/dev/null; then echo "${HEADER}" | jq; else echo "${HEADER}"; fi
-	# echo "Payload:"
-	if type jq >/dev/null; then echo "${PAYLOAD}" | jq; else echo "${PAYLOAD}"; fi
-	# echo "Signature:"
-	# echo "${SIGNATURE}"
+	printf '{"header": %s, "payload": %s, "signature": "%s"}' "${HEADER:="{}"}" "${PAYLOAD:="{}"}" "${SIGNATURE:=""}" | jq
 }
 
 # FUNCTION TO UPDATE DOTFILES AND APPLY CHANGES
